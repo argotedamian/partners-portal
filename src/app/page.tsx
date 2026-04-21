@@ -1,65 +1,99 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Toaster } from 'sonner';
+import { Form } from '@/components/form';
+import { Result } from '@/components/result';
+import { RiveAnimation } from '@/components/rive-animation';
+import Footer from '@/components/Footer';
+
+type Qualification = {
+  status_id: number;
+  is_quotation_only?: boolean;
+  api_res_data?: {
+    idHoggax?: number | null;
+    front?: {
+      nombre?: string;
+      agente?: {
+        nombre?: string;
+        email?: string;
+        telefono?: string;
+        foto?: string | null;
+      };
+    };
+    cotizacion?: {
+      costoServicio?: number;
+      costoServicioRaw?: number;
+      legales?: string;
+      facilite_desPago?: Array<{
+        _id: string;
+        orden: number;
+        cuotas: number;
+        visible: boolean;
+        destacado?: boolean;
+        texto: string;
+        subTexto?: string;
+        precioTexto?: string;
+        infoTexto?: string;
+        importe: number;
+        importeTotal?: number;
+      }>;
+      discount?: number;
+      discountRef?: number | null;
+    };
+  };
+};
 
 export default function Home() {
+  const [qualification, setQualification] = useState<Qualification | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-[var(--app-lilac)]" />;
+  }
+
+  if (qualification) {
+    return (
+      <>
+        <main>
+          <Result qualification={qualification} isPartners={true} />
+        </main>
+        <Footer />
+        <Toaster position="top-right" />
+      </>
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+    <>
+      <main className="bg-[var(--app-lilac)] min-h-[calc(100vh-4.5rem)]">
+        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="flex flex-col lg:flex-row lg:gap-10 lg:items-start">
+
+            {/* Columna izquierda: título + animación */}
+            <div className="flex flex-col min-w-0 flex-1 pt-6 pb-4 lg:py-6 lg:sticky lg:top-16">
+              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-[#171717] mb-4 lg:mb-5">
+                Partners
+              </h1>
+              <div className="min-h-[200px] flex flex-col justify-center">
+                <RiveAnimation name="09_personas_cocinando" />
+              </div>
+            </div>
+
+            {/* Columna derecha: formulario */}
+            <div className="w-full lg:w-[400px] xl:w-[460px] flex-shrink-0 lg:py-6 pb-8">
+              <Form onComplete={setQualification} />
+            </div>
+          </div>
         </div>
       </main>
-    </div>
+
+      <Footer />
+      <Toaster position="top-right" />
+    </>
   );
 }
