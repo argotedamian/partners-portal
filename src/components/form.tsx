@@ -12,6 +12,7 @@ import {
   ANTIQUITIES,
   TERMS,
 } from '@/lib/constants';
+import { createQuotation } from '@/lib/quotation.api';
 
 // Tipos del formulario
 type PersonalData = {
@@ -42,45 +43,7 @@ type FormValues = {
   is_real_estate: boolean;
 };
 
-// Tipo para la qualification
-type Qualification = {
-  status_id: number;
-  is_quotation_only?: boolean;
-  id?: number | null;
-  bail_number?: string | null;
-  quotation_id?: number | null;
-  api_res_data?: {
-    idHoggax?: number | null;
-    front?: {
-      nombre?: string;
-      agente?: {
-        nombre?: string;
-        email?: string;
-        telefono?: string;
-        foto?: string | null;
-      };
-    };
-    cotizacion?: {
-      costoServicio?: number;
-      costoServicioRaw?: number;
-      legales?: string;
-      facilita_desPago?: Array<{
-        _id: string;
-        orden: number;
-        cuotas: number;
-        visible: boolean;
-        destacado?: boolean;
-        texto: string;
-        subTexto?: string;
-        precioTexto?: string;
-        infoTexto?: string;
-        importe: number;
-      }>;
-      discount?: number;
-      discountRef?: number | null;
-    };
-  };
-};
+import type { Qualification } from '@/lib/quotation.api';
 
 interface FormProps {
   onComplete: (qualification: Qualification) => void;
@@ -186,76 +149,36 @@ export function Form({ onComplete }: FormProps) {
       return;
     }
 
+    if (!data.quotation.rent || !data.quotation.expenses) {
+      toast.error('Ingresá el alquiler y las expensas');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const agent = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
 
-      const mockQualification: Qualification = {
-        status_id: 4,
-        is_quotation_only: true,
-        api_res_data: {
-          idHoggax: null,
-          front: {
-            nombre: 'Juan',
-            agente: (() => {
-              const found = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
-              return found ? { nombre: found.label, email: found.email, telefono: found.phone, foto: null } : undefined;
-            })(),
-          },
-          cotizacion: {
-            costoServicio: 350000,
-            costoServicioRaw: 350000,
-            legales: 'Legales del servicio...',
-            facilita_desPago: [
-              {
-                _id: 'po_0',
-                orden: 1,
-                cuotas: 0,
-                visible: true,
-                texto: 'Transferencia',
-                subTexto: 'Precio final',
-                importe: 350000,
-              },
-              {
-                _id: 'po_1',
-                orden: 2,
-                cuotas: 3,
-                visible: true,
-                destacado: true,
-                texto: '3 cuotas sin interés',
-                subTexto: '$116.666 por cuota',
-                importe: 350000,
-              },
-              {
-                _id: 'po_2',
-                orden: 3,
-                cuotas: 6,
-                visible: true,
-                texto: '6 cuotas',
-                subTexto: '$58.333 por cuota',
-                infoTexto: 'Total: $350.000',
-                importe: 350000,
-              },
-              {
-                _id: 'po_3',
-                orden: 4,
-                cuotas: 12,
-                visible: true,
-                texto: '12 cuotas',
-                subTexto: '$29.166 por cuota',
-                infoTexto: 'Total: $350.000',
-                importe: 350000,
-              },
-            ],
-            discount: 0,
-            discountRef: null,
-          },
+      const qualification = await createQuotation(
+        {
+          rent: data.quotation.rent,
+          expenses: data.quotation.expenses,
+          term: data.quotation.term,
+          discount_code: data.quotation.discount_code || undefined,
+          is_partner: true,
+          agent_email: data.agent_email,
+          contact_email: data.send_agent_email_to_tenant
+            ? data.user_personal_data.email || undefined
+            : undefined,
         },
-      };
+        agent?.label,
+        agent?.phone,
+      );
 
-      onComplete(mockQualification);
+      onComplete(qualification);
       toast.success('Cotización creada');
     } catch (error) {
-      toast.error('Error al crear cotización');
+      console.error('[Form] error:', error);
+      toast.error('Error al crear la cotización. Intentá de nuevo.');
     } finally {
       setIsLoading(false);
     }

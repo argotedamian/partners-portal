@@ -136,88 +136,93 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
     return (
       <section className="py-8 sm:py-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div>
-              <div className="pr-4">
-                {qualification.is_quotation_only ? (
-                  <>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl mb-4 font-bold text-[var(--app-green)]">
-                      Tu cotización está lista
-                    </h2>
-                    <p className="text-2xl sm:text-3xl lg:text-4xl text-gray-900">
-                      Mirá el <strong className="font-bold">valor del servicio</strong>
-                      y los planes de pago disponibles.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl mb-4 font-bold text-[var(--app-green)]">
-                      ¡Felicitaciones {name}!
-                    </h2>
-                    <p className="text-2xl sm:text-3xl lg:text-4xl text-gray-900">
-                      Tu garantía Hoggax de alquiler{' '}
-                      <strong className="font-bold">está aprobada</strong>
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
 
-            <div className="text-left">
-              <p className="text-xl sm:text-2xl lg:text-3xl mb-3">
-                <strong>
-                  El valor de tu garantía es de{' '}
-                  <span className="text-[var(--primary)]">
-                    {formatArs(quoteValue)}
-                  </span>
-                </strong>
-              </p>
-
-              {isPartners && paymentMethods.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-lg sm:text-xl font-bold mb-3">Planes de pago</p>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {paymentMethods.map((method) => (
-                      <div
-                        key={method._id}
-                        className={`flex flex-col justify-between p-4 bg-[var(--app-lilac)] rounded-lg h-full ${
-                          method.destacado ? 'ring-2 ring-[var(--primary)]' : ''
-                        }`}
-                      >
-                        <div>
-                          <p className="font-bold text-base text-gray-900">{method.texto}</p>
-                          <p className="text-gray-500 text-sm">{method.subTexto}</p>
-                          {method.infoTexto && (
-                            <p className="text-gray-500 text-sm">{method.infoTexto}</p>
-                          )}
-                        </div>
-                        <div className="mt-2 text-right">
-                          <p className="font-bold text-[var(--primary)] text-xl">
-                            {formatArs(method.importe)}
-                          </p>
-                          {method.cuotas > 1 && (
-                            <p className="text-gray-500 text-sm">por cuota</p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Botones de acción */}
-              {isPartners && !qualification.is_quotation_only && (
-                <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={copyWhatsAppSummary}
-                    className="px-5 py-3 border border-gray-400 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    {copied ? 'Copiado al portapapeles' : 'Copiar resumen para WhatsApp'}
-                  </button>
-                </div>
-              )}
-            </div>
+          {/* Fila 1: título + descripción (50% izq en lg) — igual que col-60 col-lg-30 */}
+          <div className="lg:w-1/2 lg:pr-12 mb-6">
+            {qualification.is_quotation_only ? (
+              <>
+                <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
+                  Tu cotización está lista
+                </h2>
+                <p className="text-4xl sm:text-5xl text-gray-900">
+                  Mirá el <strong className="font-extrabold">valor del servicio</strong>{' '}
+                  y los planes de pago disponibles.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
+                  ¡Felicitaciones {name}!
+                </h2>
+                <p className="text-4xl sm:text-5xl text-gray-900">
+                  Tu garantía Hoggax de alquiler{' '}
+                  <strong className="font-extrabold">está aprobada</strong>
+                </p>
+              </>
+            )}
           </div>
+
+          {/* Fila 2: valor + cards (ancho completo) — igual que col-60 container */}
+          <div className="mt-4">
+            <p className="text-2xl sm:text-3xl font-bold mb-3">
+              El valor de tu garantía es de{' '}
+              <span className="text-[var(--primary)]">{formatArs(quoteValue)}</span>
+            </p>
+
+            {isPartners && paymentMethods.length > 0 && (
+              <div className="mt-4">
+                <p className="text-lg sm:text-xl font-bold mb-3">Planes de pago</p>
+                {/* Cards horizontales: título izq, precio der — igual que justify-content-between align-items-center */}
+                <div className="flex flex-col sm:flex-row gap-2">
+                  {paymentMethods.map((method) => (
+                    <div
+                      key={method._id}
+                      className={`flex-1 flex justify-between items-center bg-[var(--app-lilac)] rounded-2xl p-4 ${
+                        method.destacado ? 'ring-2 ring-[var(--primary)]' : ''
+                      }`}
+                    >
+                      <div className="flex-1 min-w-0 pr-2">
+                        <p className="font-bold text-lg leading-tight text-gray-900 mb-0">
+                          {method.texto}
+                        </p>
+                        {method.subTexto && (
+                          <p className="text-gray-500 text-sm leading-tight mb-0">
+                            {method.subTexto}
+                          </p>
+                        )}
+                        {method.infoTexto && (
+                          <p className="text-gray-500 text-sm leading-tight mb-0">
+                            {method.infoTexto}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="font-bold text-[var(--primary)] text-2xl leading-tight mb-0">
+                          {formatArs(method.importe)}
+                        </p>
+                        {method.cuotas > 1 && (
+                          <p className="text-gray-500 text-sm mb-0">por cuota</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Botones de acción */}
+            {isPartners && !qualification.is_quotation_only && (
+              <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={copyWhatsAppSummary}
+                  className="px-5 py-3 border border-gray-400 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                >
+                  {copied ? 'Copiado al portapapeles' : 'Copiar resumen para WhatsApp'}
+                </button>
+              </div>
+            )}
+          </div>
+
         </div>
       </section>
     );
