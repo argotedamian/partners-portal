@@ -146,13 +146,76 @@ function mapResponseToQualification(
   };
 }
 
+// Tipos del request de calificación
+export type QualificationRequest = {
+  user_personal_data: {
+    document_type_id: number;
+    document_value: string;
+    gender_id: number | null;
+    phone: string;
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    employment_situation_id: number | null;
+    antiquity_id: number | null;
+    monthly_income: number | null;
+  };
+  quotation: {
+    rent: number;
+    expenses: number;
+    term: number;
+    discount_code?: string;
+  };
+  agent_email: string;
+  send_agent_email_to_tenant: boolean;
+  is_real_estate: boolean;
+  origin_id: 2;
+  solofo: true;
+};
+
+type QualificationApiResponse = {
+  qualification: {
+    id: number;
+    status_id: number;
+    api_res_data: Qualification['api_res_data'];
+  };
+};
+
+// Llama al endpoint de calificación y devuelve Qualification mapeada
+export async function createQualification(body: QualificationRequest): Promise<Qualification> {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (!baseUrl) throw new Error('Missing NEXT_PUBLIC_BACKEND_URL');
+  const url = `${baseUrl}/api/web/v1/qualifications`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Error ${res.status}${text ? `: ${text}` : ''}`);
+  }
+
+  const data: QualificationApiResponse = await res.json();
+  return {
+    status_id: data.qualification.status_id,
+    is_quotation_only: false,
+    id: data.qualification.id,
+    api_res_data: data.qualification.api_res_data,
+  };
+}
+
 // Función principal: llama al endpoint y devuelve Qualification mapeada
 export async function createQuotation(
   body: QuotationRequest,
   agentLabel?: string,
   agentPhone?: string,
 ): Promise<Qualification> {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/web/v2/individual/quotations`;
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (!baseUrl) throw new Error('Missing NEXT_PUBLIC_BACKEND_URL');
+  const url = `${baseUrl}/api/web/v2/individual/quotations`;
 
   const res = await fetch(url, {
     method: 'POST',

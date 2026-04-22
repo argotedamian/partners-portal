@@ -12,7 +12,7 @@ import {
   ANTIQUITIES,
   TERMS,
 } from '@/lib/constants';
-import { createQuotation } from '@/lib/quotation.api';
+import { createQuotation, createQualification } from '@/lib/quotation.api';
 
 // Tipos del formulario
 type PersonalData = {
@@ -156,29 +156,68 @@ export function Form({ onComplete }: FormProps) {
     }
 
     try {
+      const { document_value, document_type_id, first_name, last_name } = data.user_personal_data;
       const agent = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
 
-      const qualification = await createQuotation(
-        {
-          rent: data.quotation.rent,
-          expenses: data.quotation.expenses,
-          term: data.quotation.term,
-          discount_code: data.quotation.discount_code || undefined,
-          is_partner: true,
+      // Routing: calificación completa si hay documento válido, cotización pura si no
+      const shouldQualify =
+        !!document_value &&
+        (document_type_id === 1 ||
+          (document_type_id === 2 && !!first_name && !!last_name));
+
+      let qualification;
+
+      if (shouldQualify) {
+        const personalData = {
+          document_type_id,
+          document_value,
+          gender_id: data.user_personal_data.gender_id,
+          phone: data.user_personal_data.phone,
+          email: data.user_personal_data.email,
+          employment_situation_id: data.user_personal_data.employment_situation_id,
+          antiquity_id: data.user_personal_data.antiquity_id,
+          monthly_income: data.user_personal_data.monthly_income,
+          ...(document_type_id === 2 ? { first_name, last_name } : {}),
+        };
+
+        qualification = await createQualification({
+          user_personal_data: personalData,
+          quotation: {
+            rent: data.quotation.rent!,
+            expenses: data.quotation.expenses!,
+            term: data.quotation.term,
+            discount_code: data.quotation.discount_code || undefined,
+          },
           agent_email: data.agent_email,
-          contact_email: data.send_agent_email_to_tenant
-            ? data.user_personal_data.email || undefined
-            : undefined,
-        },
-        agent?.label,
-        agent?.phone,
-      );
+          send_agent_email_to_tenant: data.send_agent_email_to_tenant,
+          is_real_estate: data.is_real_estate,
+          origin_id: 2,
+          solofo: true,
+        });
+        toast.success('Calificación procesada');
+      } else {
+        qualification = await createQuotation(
+          {
+            rent: data.quotation.rent!,
+            expenses: data.quotation.expenses!,
+            term: data.quotation.term,
+            discount_code: data.quotation.discount_code || undefined,
+            is_partner: true,
+            agent_email: data.agent_email,
+            contact_email: data.send_agent_email_to_tenant
+              ? data.user_personal_data.email || undefined
+              : undefined,
+          },
+          agent?.label,
+          agent?.phone,
+        );
+        toast.success('Cotización creada');
+      }
 
       onComplete(qualification);
-      toast.success('Cotización creada');
     } catch (error) {
       console.error('[Form] error:', error);
-      toast.error('Error al crear la cotización. Intentá de nuevo.');
+      toast.error('Error al procesar la solicitud. Intentá de nuevo.');
     } finally {
       setIsLoading(false);
     }

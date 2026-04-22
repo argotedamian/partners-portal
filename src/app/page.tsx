@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster } from 'sonner';
 import { Form } from '@/components/form';
 import { Result } from '@/components/result';
@@ -47,10 +48,19 @@ type Qualification = {
 export default function Home() {
   const [qualification, setQualification] = useState<Qualification | null>(null);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!searchParams) return;
+    if (!searchParams.get('reset')) return;
+    setQualification(null);
+    router.replace('/');
+  }, [router, searchParams]);
 
   if (!mounted) {
     return <div className="min-h-screen bg-[var(--app-lilac)]" />;

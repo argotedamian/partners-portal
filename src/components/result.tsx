@@ -211,16 +211,26 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
             )}
 
             {/* Botones de acción */}
-            {isPartners && !qualification.is_quotation_only && (
-              <div className="mt-5 flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={copyWhatsAppSummary}
-                  className="px-5 py-3 border border-gray-400 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                >
-                  {copied ? 'Copiado al portapapeles' : 'Copiar resumen para WhatsApp'}
-                </button>
-              </div>
-            )}
+              {isPartners && !qualification.is_quotation_only && (
+                <div className="mt-5 flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={copyWhatsAppSummary}
+                    className="px-5 py-3 border border-[var(--primary)] text-[var(--primary)] rounded-full font-bold hover:bg-red-50 transition-colors"
+                  >
+                    {copied ? 'Copiado al portapapeles' : 'Copiar resumen para WhatsApp'}
+                  </button>
+                  {qualification.id && (
+                    <a
+                      href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/web/v1/qualifications/${qualification.id}/certificate`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-5 py-3 bg-[var(--primary)] text-white rounded-full font-bold hover:bg-[var(--primary-hover)] transition-colors text-center"
+                    >
+                      Descargar certificado
+                    </a>
+                  )}
+                </div>
+              )}
           </div>
 
         </div>
@@ -228,78 +238,86 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
     );
   }
 
-  // Pending (status_id: 6)
+  // Casi aprobado (status_id: 6) — pasaporte o documentación a validar
   if (statusId === 6) {
     return (
-      <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="text-2xl sm:text-3xl mb-4 text-[var(--app-green)] font-bold">
-                {name} ¡Ya casi está!
+      <>
+        {/* Sección superior — blanco */}
+        <section className="py-8 sm:py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="lg:w-1/2 lg:pr-12">
+              <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
+                {name ? `${name} ` : ''}¡Ya casi está!
               </h2>
               <p className="text-xl text-gray-900">
                 Para ofrecerte una garantía necesitaremos validar tu documentación e ingresos.
               </p>
             </div>
-            <div>
-              <p className="text-xl text-gray-900">
-                {agent ? (
-                  <strong className="font-bold">{agent.nombre}</strong>
-                ) : (
-                  'Uno de nuestros agentes'
-                )}{' '}
-                te va a contactar para asesorarte con tu garantía.
-              </p>
-              <p className="text-lg text-gray-900 mt-2">
-                <strong className="font-bold">
-                  Vas a recibir un email con las instrucciones para completar el proceso.
-                </strong>
-              </p>
-              <p className="text-gray-600 mt-2">
-                Si no lo recibís en tu bandeja de entrada te sugerimos que revises
-                la carpeta de correo no deseado.
-              </p>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Sección inferior — lilac */}
+        <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
+          <div className="max-w-6xl mx-auto px-4">
+            <p className="text-xl text-gray-900">
+              {agent ? (
+                <strong className="font-bold">{agent.nombre}</strong>
+              ) : (
+                'Uno de nuestros agentes'
+              )}{' '}
+              te va a contactar para asesorarte con tu garantía.
+            </p>
+            <p className="text-lg text-gray-900 mt-3">
+              <strong className="font-bold">
+                Vas a recibir un email con las instrucciones para completar el proceso.
+              </strong>
+            </p>
+            <p className="text-gray-600 mt-2">
+              Si no lo recibís en tu bandeja de entrada te sugerimos que revises
+              la carpeta de correo no deseado.
+            </p>
+          </div>
+        </section>
+      </>
     );
   }
 
-  // Cosolicitante (status_id: 9)
+  // Co-solicitante (status_id: 9)
   if (statusId === 9) {
     return (
-      <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="text-2xl sm:text-3xl mb-4 text-[var(--app-green)] font-bold">
-                {name} ¡Ya casi está!
+      <>
+        {/* Sección superior — blanco */}
+        <section className="py-8 sm:py-12">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="lg:w-1/2 lg:pr-12">
+              <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
+                {name ? `${name} ` : ''}¡Ya casi está!
               </h2>
               <p className="text-xl text-gray-900">
-                Para que podamos emitir tu garantía
-                <br />
-                Hoggax solo{' '}
+                Para que podamos emitir tu garantía, Hoggax solo{' '}
                 <strong className="font-bold">
                   necesitamos sumar a otra persona a tu solicitud
                 </strong>
                 .
               </p>
             </div>
-            <div>
-              <p className="text-xl text-gray-900">
-                {agent ? (
-                  <strong className="font-bold">{agent.nombre}</strong>
-                ) : (
-                  'Uno de nuestros agentes'
-                )}{' '}
-                te va a contactar para asesorarte con tu garantía.
-              </p>
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Sección inferior — lilac */}
+        <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
+          <div className="max-w-6xl mx-auto px-4">
+            <p className="text-xl text-gray-900">
+              {agent ? (
+                <strong className="font-bold">{agent.nombre}</strong>
+              ) : (
+                'Uno de nuestros agentes'
+              )}{' '}
+              te va a contactar para asesorarte con tu garantía.
+            </p>
+          </div>
+        </section>
+      </>
     );
   }
 
@@ -378,39 +396,46 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
     );
   }
 
-  // Rechazada (cualquier otro caso)
+  // Rechazada (cualquier otro caso: 7, 8, y fallback)
   return (
-    <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="grid lg:grid-cols-2 gap-8 items-center">
-          <div>
-            <h2 className="text-2xl sm:text-3xl mb-4 text-gray-900">
+    <>
+      {/* Sección superior — blanco */}
+      <section className="py-8 sm:py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="lg:w-1/2 lg:pr-12">
+            <h2 className="text-4xl sm:text-5xl text-gray-900 leading-snug">
               {name ? `${name}, no` : 'No'} podemos ofrecerte una garantía.
             </h2>
           </div>
-          <div>
-            <p className="text-xl text-gray-900">
-              <strong className="font-bold">
+        </div>
+      </section>
+
+      {/* Sección inferior — lilac */}
+      <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            <div>
+              <p className="text-xl text-gray-900 font-bold">
                 Desafortunadamente no contás con los requisitos mínimos para
                 solicitar nuestra garantía.
-              </strong>
-            </p>
-            <p className="text-lg text-gray-900 mt-2">
-              Si tenés más consultas, podés ver nuestra sección de Preguntas Frecuentes.
-            </p>
-            <div className="mt-5">
+              </p>
+              <p className="text-lg text-gray-700 mt-2">
+                Si tenés más consultas, podés ver nuestra sección de Preguntas Frecuentes.
+              </p>
+            </div>
+            <div>
               <a
                 href="https://hoggax.com/preguntas/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block px-5 py-3 border border-gray-500 rounded-lg"
+                className="inline-block px-6 py-3 border border-gray-500 rounded-lg font-medium hover:bg-white transition-colors"
               >
                 Ver preguntas frecuentes
               </a>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

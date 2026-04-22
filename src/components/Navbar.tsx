@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 
 const NAV_LINKS = [
   { label: 'Inquilinos', href: 'https://hoggax.com/inquilinos/', external: true },
@@ -33,11 +34,11 @@ export function Navbar() {
       <nav className="navbar-host">
         <div className="navbar-inner">
           {/* Brand */}
-          <a href="https://hoggax.com/" className="navbar-brand" aria-label="Hoggax" target="_blank" rel="noopener noreferrer">
+          <Link href="/?reset=1" className="navbar-brand" aria-label="Hoggax">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/hoggax-logo.svg" alt="Hoggax" className="navbar-logo" />
             <strong className="navbar-badge">(partners)</strong>
-          </a>
+          </Link>
 
           {/* Desktop links */}
           <ul className="navbar-desktop-links">
