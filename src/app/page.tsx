@@ -68,19 +68,21 @@ export default function Home() {
 
   if (qualification) {
     return (
-      <>
-        <main>
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-1">
           <Result qualification={qualification} isPartners={true} />
         </main>
-        <Footer />
+        <div className="mt-auto">
+          <Footer />
+        </div>
         <Toaster position="top-right" />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <main className="bg-[var(--app-lilac)] min-h-[calc(100vh-4.5rem)]">
+    <div className="min-h-screen flex flex-col">
+      <main className="bg-[var(--app-lilac)] flex-1">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex flex-col lg:flex-row lg:gap-10 lg:items-start">
 
@@ -102,8 +104,10 @@ export default function Home() {
         </div>
       </main>
 
-      <Footer />
+      <div className="mt-auto">
+        <Footer />
+      </div>
       <Toaster position="top-right" />
-    </>
+    </div>
   );
 }

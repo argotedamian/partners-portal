@@ -104,6 +104,15 @@ export function Form({ onComplete }: FormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDocType, setSelectedDocType] = useState(1);
 
+  function sanitizeNumericInput(value: string): string {
+    return value.replace(/\D/g, '');
+  }
+
+  function normalizeNullableNumber(value: number | null): number | null {
+    if (value === null) return null;
+    return Number.isFinite(value) ? value : null;
+  }
+
   const {
     register,
     handleSubmit,
@@ -159,6 +168,32 @@ export function Form({ onComplete }: FormProps) {
       const { document_value, document_type_id, first_name, last_name } = data.user_personal_data;
       const agent = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
 
+      const normalizedGenderId = normalizeNullableNumber(data.user_personal_data.gender_id);
+      const normalizedEmploymentSituationId = normalizeNullableNumber(data.user_personal_data.employment_situation_id);
+      const normalizedAntiquityId = normalizeNullableNumber(data.user_personal_data.antiquity_id);
+      const normalizedMonthlyIncome = normalizeNullableNumber(data.user_personal_data.monthly_income);
+
+      if (!normalizedGenderId) {
+        toast.error('Seleccioná el género');
+        return;
+      }
+
+      if (!normalizedEmploymentSituationId) {
+        toast.error('Seleccioná la situación laboral');
+        return;
+      }
+
+      if (normalizedEmploymentSituationId !== 1) {
+        if (!normalizedAntiquityId) {
+          toast.error('Seleccioná la antigüedad');
+          return;
+        }
+        if (!normalizedMonthlyIncome) {
+          toast.error('Ingresá los ingresos mensuales');
+          return;
+        }
+      }
+
       // Routing: calificación completa si hay documento válido, cotización pura si no
       const shouldQualify =
         !!document_value &&
@@ -168,15 +203,19 @@ export function Form({ onComplete }: FormProps) {
       let qualification;
 
       if (shouldQualify) {
+        const normalizedDocumentValue = document_type_id === 1
+          ? sanitizeNumericInput(document_value)
+          : document_value.trim();
+
         const personalData = {
           document_type_id,
-          document_value,
-          gender_id: data.user_personal_data.gender_id,
-          phone: data.user_personal_data.phone,
+          document_value: normalizedDocumentValue,
+          gender_id: normalizedGenderId,
+          phone: sanitizeNumericInput(data.user_personal_data.phone),
           email: data.user_personal_data.email,
-          employment_situation_id: data.user_personal_data.employment_situation_id,
-          antiquity_id: data.user_personal_data.antiquity_id,
-          monthly_income: data.user_personal_data.monthly_income,
+          employment_situation_id: normalizedEmploymentSituationId,
+          antiquity_id: normalizedEmploymentSituationId === 1 ? null : normalizedAntiquityId,
+          monthly_income: normalizedEmploymentSituationId === 1 ? null : normalizedMonthlyIncome,
           ...(document_type_id === 2 ? { first_name, last_name } : {}),
         };
 
@@ -187,12 +226,13 @@ export function Form({ onComplete }: FormProps) {
             expenses: data.quotation.expenses!,
             term: data.quotation.term,
             discount_code: data.quotation.discount_code || undefined,
+            ref: 'partners-portal',
           },
+          origin_id: 1,
+          is_partner: true,
           agent_email: data.agent_email,
           send_agent_email_to_tenant: data.send_agent_email_to_tenant,
-          is_real_estate: data.is_real_estate,
-          origin_id: 2,
-          solofo: true,
+          is_real_estate: false,
         });
         toast.success('Calificación procesada');
       } else {

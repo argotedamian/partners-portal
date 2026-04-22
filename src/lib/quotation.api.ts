@@ -165,12 +165,13 @@ export type QualificationRequest = {
     expenses: number;
     term: number;
     discount_code?: string;
+    ref?: string;
   };
+  is_partner: true;
   agent_email: string;
   send_agent_email_to_tenant: boolean;
   is_real_estate: boolean;
-  origin_id: 2;
-  solofo: true;
+  origin_id: 1;
 };
 
 type QualificationApiResponse = {
@@ -179,6 +180,13 @@ type QualificationApiResponse = {
     status_id: number;
     api_res_data: Qualification['api_res_data'];
   };
+};
+
+type BackendEnvelope<TBody> = {
+  status?: number;
+  message?: string;
+  body?: TBody | null;
+  validation?: Record<string, string[]>;
 };
 
 // Llama al endpoint de calificación y devuelve Qualification mapeada
@@ -198,12 +206,26 @@ export async function createQualification(body: QualificationRequest): Promise<Q
     throw new Error(`Error ${res.status}${text ? `: ${text}` : ''}`);
   }
 
-  const data: QualificationApiResponse = await res.json();
+  const raw: unknown = await res.json();
+  const data = raw as QualificationApiResponse | BackendEnvelope<QualificationApiResponse>;
+
+  const qualification = ('qualification' in (data as QualificationApiResponse))
+    ? (data as QualificationApiResponse).qualification
+    : (data as BackendEnvelope<QualificationApiResponse>).body?.qualification;
+
+  if (!qualification) {
+    const envelope = data as BackendEnvelope<QualificationApiResponse>;
+    const validation = envelope.validation
+      ? ` Validation: ${JSON.stringify(envelope.validation)}`
+      : '';
+    throw new Error(`Unexpected qualification response.${validation}`);
+  }
+
   return {
-    status_id: data.qualification.status_id,
+    status_id: qualification.status_id,
     is_quotation_only: false,
-    id: data.qualification.id,
-    api_res_data: data.qualification.api_res_data,
+    id: qualification.id,
+    api_res_data: qualification.api_res_data,
   };
 }
 
