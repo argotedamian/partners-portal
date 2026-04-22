@@ -192,32 +192,6 @@ export function Form({ onComplete }: FormProps) {
       const { document_value, document_type_id, first_name, last_name } = data.user_personal_data;
       const agent = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
 
-      const normalizedGenderId = normalizeNullableNumber(data.user_personal_data.gender_id);
-      const normalizedEmploymentSituationId = normalizeNullableNumber(data.user_personal_data.employment_situation_id);
-      const normalizedAntiquityId = normalizeNullableNumber(data.user_personal_data.antiquity_id);
-      const normalizedMonthlyIncome = normalizeNullableNumber(data.user_personal_data.monthly_income);
-
-      if (!normalizedGenderId) {
-        toast.error('Seleccioná el género');
-        return;
-      }
-
-      if (!normalizedEmploymentSituationId) {
-        toast.error('Seleccioná la situación laboral');
-        return;
-      }
-
-      if (normalizedEmploymentSituationId !== 1) {
-        if (!normalizedAntiquityId) {
-          toast.error('Seleccioná la antigüedad');
-          return;
-        }
-        if (!normalizedMonthlyIncome) {
-          toast.error('Ingresá los ingresos mensuales');
-          return;
-        }
-      }
-
       // Routing: calificación completa si hay documento válido, cotización pura si no
       const shouldQualify =
         !!document_value &&
@@ -227,6 +201,32 @@ export function Form({ onComplete }: FormProps) {
       let qualification;
 
       if (shouldQualify) {
+        const normalizedGenderId = normalizeNullableNumber(data.user_personal_data.gender_id);
+        const normalizedEmploymentSituationId = normalizeNullableNumber(data.user_personal_data.employment_situation_id);
+        const normalizedAntiquityId = normalizeNullableNumber(data.user_personal_data.antiquity_id);
+        const normalizedMonthlyIncome = normalizeNullableNumber(data.user_personal_data.monthly_income);
+
+        if (!normalizedGenderId) {
+          toast.error('Seleccioná el género');
+          return;
+        }
+
+        if (!normalizedEmploymentSituationId) {
+          toast.error('Seleccioná la situación laboral');
+          return;
+        }
+
+        if (normalizedEmploymentSituationId !== 1) {
+          if (!normalizedAntiquityId) {
+            toast.error('Seleccioná la antigüedad');
+            return;
+          }
+          if (!normalizedMonthlyIncome) {
+            toast.error('Ingresá los ingresos mensuales');
+            return;
+          }
+        }
+
         const normalizedDocumentValue = document_type_id === 1
           ? sanitizeNumericInput(document_value)
           : document_value.trim();
