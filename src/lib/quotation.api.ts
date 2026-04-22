@@ -189,6 +189,50 @@ type BackendEnvelope<TBody> = {
   validation?: Record<string, string[]>;
 };
 
+export type DiscountValidateResponseBody = {
+  discountPercent: { value: number } | null;
+  discountMoney: unknown | null;
+};
+
+export type DiscountValidationResult =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'valid'; percent: number }
+  | { status: 'invalid'; message: string };
+
+export async function validateDiscountCode(code: string): Promise<DiscountValidationResult> {
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (!baseUrl) throw new Error('Missing NEXT_PUBLIC_BACKEND_URL');
+
+  const normalizedCode = code.trim().startsWith('#') ? code.trim() : `#${code.trim()}`;
+  if (!normalizedCode || normalizedCode === '#') return { status: 'idle' };
+
+  const url = `${baseUrl}/api/web/v2/discounts/validate`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: normalizedCode }),
+  });
+
+  const raw: unknown = await res.json().catch(() => null);
+
+  if (res.ok) {
+    const envelope = raw as BackendEnvelope<DiscountValidateResponseBody>;
+    const percent = envelope.body?.discountPercent?.value ?? null;
+    if (typeof percent === 'number') return { status: 'valid', percent };
+    return { status: 'invalid', message: 'El código ingresado no es válido' };
+  }
+
+  if (res.status === 404) {
+    const envelope = raw as BackendEnvelope<null>;
+    return { status: 'invalid', message: envelope.message ?? 'El código ingresado no es válido' };
+  }
+
+  const text = typeof raw === 'string' ? raw : raw ? JSON.stringify(raw) : '';
+  throw new Error(`Error ${res.status}${text ? `: ${text}` : ''}`);
+}
+
 // Llama al endpoint de calificación y devuelve Qualification mapeada
 export async function createQualification(body: QualificationRequest): Promise<Qualification> {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;

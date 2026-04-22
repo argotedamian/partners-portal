@@ -12,7 +12,7 @@ import {
   ANTIQUITIES,
   TERMS,
 } from '@/lib/constants';
-import { createQuotation, createQualification } from '@/lib/quotation.api';
+import { createQuotation, createQualification, validateDiscountCode } from '@/lib/quotation.api';
 
 // Tipos del formulario
 type PersonalData = {
@@ -103,6 +103,8 @@ function DocTypeSelect({
 export function Form({ onComplete }: FormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDocType, setSelectedDocType] = useState(1);
+  const [discountValidation, setDiscountValidation] = useState<Awaited<ReturnType<typeof validateDiscountCode>>>({ status: 'idle' });
+  const discountTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function sanitizeNumericInput(value: string): string {
     return value.replace(/\D/g, '');
@@ -147,6 +149,28 @@ export function Form({ onComplete }: FormProps) {
   });
 
   const employmentSituationId = watch('user_personal_data.employment_situation_id');
+  const discountCode = watch('quotation.discount_code');
+
+  useEffect(() => {
+    if (discountTimer.current) clearTimeout(discountTimer.current);
+
+    const code = (discountCode ?? '').trim();
+    if (!code) {
+      setDiscountValidation({ status: 'idle' });
+      return;
+    }
+
+    setDiscountValidation({ status: 'loading' });
+    discountTimer.current = setTimeout(() => {
+      validateDiscountCode(code)
+        .then(setDiscountValidation)
+        .catch(() => setDiscountValidation({ status: 'invalid', message: 'No pudimos validar el cupón' }));
+    }, 350);
+
+    return () => {
+      if (discountTimer.current) clearTimeout(discountTimer.current);
+    };
+  }, [discountCode]);
 
   const onSubmit = async (data: FormValues) => {
     console.log('[Form] submit:', data);
@@ -538,6 +562,24 @@ export function Form({ onComplete }: FormProps) {
               {...register('quotation.discount_code')}
               placeholder="Código"
             />
+            {discountValidation.status === 'invalid' && (
+              <span className="mt-2 flex items-center gap-2 text-sm font-bold text-[var(--primary)]">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-[var(--primary)]">
+                  ×
+                </span>
+                {discountValidation.message === 'El código ingresado no es válido'
+                  ? 'El código ingresado no es válido'
+                  : discountValidation.message}
+              </span>
+            )}
+            {discountValidation.status === 'valid' && (
+              <span className="mt-2 flex items-center gap-2 text-sm font-bold text-[var(--app-green)]">
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border border-[var(--app-green)]">
+                  ✓
+                </span>
+                {discountValidation.percent}% de descuento
+              </span>
+            )}
           </div>
         </fieldset>
 
