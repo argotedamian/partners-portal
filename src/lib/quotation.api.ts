@@ -41,11 +41,31 @@ type ApiResponse = {
   quotation_user_id?: number | null;
 };
 
+/** Plan de pago en `api_res_data.cotizacion` (lambda / calificación). */
+export type QualificationPaymentMethod = {
+  _id: string;
+  orden: number;
+  cuotas: number;
+  visible: boolean;
+  destacado?: boolean;
+  texto: string;
+  subTexto?: string;
+  precioTexto?: string;
+  infoTexto?: string;
+  importe: number;
+  importeTotal?: number;
+  importeCuota?: number;
+  importeAdelanto?: number;
+};
+
 // Shape que consume Result
 export type Qualification = {
   status_id: number;
   is_quotation_only?: boolean;
   id?: number | null;
+  bail_number?: string | null;
+  /** Deal de Pipedrive asociado (respuesta de creación de calificación). */
+  pipedrive_id?: number | string | null;
   quotation_id?: number | null;
   api_res_data?: {
     idHoggax?: number | null;
@@ -59,27 +79,68 @@ export type Qualification = {
       };
     };
     cotizacion?: {
+      alquiler?: number;
+      expensas?: number;
+      /** Años de contrato en API Hoggax (p. ej. 2 → 24 meses). */
+      plazo?: number;
       costoServicio?: number;
       costoServicioRaw?: number;
       legales?: string;
-      facilita_desPago?: Array<{
-        _id: string;
-        orden: number;
-        cuotas: number;
-        visible: boolean;
-        destacado?: boolean;
-        texto: string;
-        subTexto?: string;
-        precioTexto?: string;
-        infoTexto?: string;
-        importe: number;
-        importeTotal?: number;
-      }>;
+      /** Alias legacy / cotización v2 mapeada. */
+      facilita_desPago?: QualificationPaymentMethod[];
+      /** Shape principal devuelto por calificar (Hoggax). */
+      facilidadesPago?: QualificationPaymentMethod[];
       discount?: number;
       discountRef?: number | null;
     };
   };
 };
+
+const DEFAULT_FIANZA_APROBACION_WEBHOOK_URL =
+  'https://hoggax.app.n8n.cloud/webhook/fianza-aprobacion';
+
+function getFianzaAprobacionWebhookUrl(): string {
+  return process.env.NEXT_PUBLIC_N8N_FIANZA_APROBACION_WEBHOOK_URL || DEFAULT_FIANZA_APROBACION_WEBHOOK_URL;
+}
+
+/**
+ * Notifica a n8n cuando la calificación queda aprobada (status 4 o 5).
+ * POST JSON: `{ "deal_id": <qualification.pipedrive_id> }` (mismo id que Pipedrive).
+ * Si no hay `pipedrive_id`, no se envía nada (best-effort).
+ */
+function toFiniteDealId(value: Qualification['pipedrive_id']): number | null {
+  if (value == null) return null;
+  const n = typeof value === 'number' ? value : Number(String(value).trim());
+  return Number.isFinite(n) ? n : null;
+}
+
+export async function notifyFianzaAprobacionWebhook(qualification: Qualification): Promise<void> {
+  const dealId = toFiniteDealId(qualification.pipedrive_id);
+  if (dealId == null) {
+    return;
+  }
+
+  const url = getFianzaAprobacionWebhookUrl();
+
+  const controller = new AbortController();
+  const timeoutMs = 10_000;
+  const scheduleTimeout = typeof window !== 'undefined' ? window.setTimeout : setTimeout;
+  const clearScheduledTimeout = typeof window !== 'undefined' ? window.clearTimeout : clearTimeout;
+  const timeoutId = scheduleTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deal_id: dealId }),
+      signal: controller.signal,
+    });
+  } catch {
+    // intentionally swallow
+  } finally {
+    clearScheduledTimeout(timeoutId);
+  }
+}
 
 // Infiere la cantidad de cuotas por orden (misma lógica que _inferirCuotas en Laravel)
 function inferCuotas(orden: number, plazo: number): number {
@@ -120,6 +181,8 @@ function mapResponseToQualification(
     status_id: 4,
     is_quotation_only: true,
     id: data.quotation_id ?? null,
+    bail_number: null,
+    pipedrive_id: null,
     quotation_id: data.quotation_id ?? null,
     api_res_data: {
       idHoggax: null,
@@ -133,6 +196,9 @@ function mapResponseToQualification(
         },
       },
       cotizacion: {
+        alquiler: cotizacion.alquiler,
+        expensas: cotizacion.expensas,
+        plazo: cotizacion.plazo,
         costoServicio: cotizacion.importe,
         costoServicioRaw: cotizacion.importeRaw,
         legales: cotizacion.legales,
@@ -178,6 +244,8 @@ type QualificationApiResponse = {
   qualification: {
     id: number;
     status_id: number;
+    bail_number?: string | null;
+    pipedrive_id?: number | string | null;
     api_res_data: Qualification['api_res_data'];
   };
 };
@@ -269,6 +337,8 @@ export async function createQualification(body: QualificationRequest): Promise<Q
     status_id: qualification.status_id,
     is_quotation_only: false,
     id: qualification.id,
+    bail_number: qualification.bail_number ?? null,
+    pipedrive_id: toFiniteDealId(qualification.pipedrive_id),
     api_res_data: qualification.api_res_data,
   };
 }

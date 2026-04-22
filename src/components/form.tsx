@@ -12,7 +12,12 @@ import {
   ANTIQUITIES,
   TERMS,
 } from '@/lib/constants';
-import { createQuotation, createQualification, validateDiscountCode } from '@/lib/quotation.api';
+import {
+  createQuotation,
+  createQualification,
+  notifyFianzaAprobacionWebhook,
+  validateDiscountCode,
+} from '@/lib/quotation.api';
 
 // Tipos del formulario
 type PersonalData = {
@@ -259,6 +264,11 @@ export function Form({ onComplete }: FormProps) {
           is_real_estate: false,
         });
         toast.success('Calificación procesada');
+
+        // n8n: solo cuando la calificación queda aprobada
+        if ([4, 5].includes(qualification.status_id)) {
+          void notifyFianzaAprobacionWebhook(qualification);
+        }
       } else {
         qualification = await createQuotation(
           {

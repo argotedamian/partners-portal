@@ -7,43 +7,7 @@ import { Form } from '@/components/form';
 import { Result } from '@/components/result';
 import { RiveAnimation } from '@/components/rive-animation';
 import Footer from '@/components/Footer';
-
-type Qualification = {
-  status_id: number;
-  is_quotation_only?: boolean;
-  api_res_data?: {
-    idHoggax?: number | null;
-    front?: {
-      nombre?: string;
-      agente?: {
-        nombre?: string;
-        email?: string;
-        telefono?: string;
-        foto?: string | null;
-      };
-    };
-    cotizacion?: {
-      costoServicio?: number;
-      costoServicioRaw?: number;
-      legales?: string;
-      facilite_desPago?: Array<{
-        _id: string;
-        orden: number;
-        cuotas: number;
-        visible: boolean;
-        destacado?: boolean;
-        texto: string;
-        subTexto?: string;
-        precioTexto?: string;
-        infoTexto?: string;
-        importe: number;
-        importeTotal?: number;
-      }>;
-      discount?: number;
-      discountRef?: number | null;
-    };
-  };
-};
+import type { Qualification } from '@/lib/quotation.api';
 
 export function HomeClient() {
   const [qualification, setQualification] = useState<Qualification | null>(null);

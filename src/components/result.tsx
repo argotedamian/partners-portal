@@ -2,48 +2,49 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import type { Qualification, QualificationPaymentMethod } from '@/lib/quotation.api';
 
-type PaymentMethod = {
-  _id: string;
-  orden: number;
-  cuotas: number;
-  visible: boolean;
-  destacado?: boolean;
-  texto: string;
-  subTexto?: string;
-  precioTexto?: string;
-  infoTexto?: string;
-  importe: number;
-  importeTotal?: number;
-};
+function coerceRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+}
 
-type Qualification = {
-  status_id: number;
-  is_quotation_only?: boolean;
-  id?: number | null;
-  bail_number?: string | null;
-  quotation_id?: number | null;
-  api_res_data?: {
-    idHoggax?: number | null;
-    front?: {
-      nombre?: string;
-      agente?: {
-        nombre?: string;
-        email?: string;
-        telefono?: string;
-        foto?: string | null;
-      };
-    };
-    cotizacion?: {
-      costoServicio?: number;
-      costoServicioRaw?: number;
-      legales?: string;
-      facilita_desPago?: PaymentMethod[];
-      discount?: number;
-      discountRef?: number | null;
-    };
+function normalizePaymentMethod(raw: unknown, idx: number): QualificationPaymentMethod {
+  const item = coerceRecord(raw);
+  const subTexto = String(item.subTexto ?? item.sub_texto ?? '');
+  const infoTexto = String(item.infoTexto ?? item.info_texto ?? '');
+  const precioTexto = String(item.precioTexto ?? item.precio_texto ?? '');
+  const texto = String(item.texto ?? '');
+
+  return {
+    _id: String(item._id ?? `pm_${idx}`),
+    orden: Number(item.orden ?? idx),
+    cuotas: Number(item.cuotas ?? 0),
+    visible: item.visible !== false,
+    destacado: Boolean(item.destacado),
+    texto,
+    subTexto: subTexto || undefined,
+    precioTexto: precioTexto || undefined,
+    infoTexto: infoTexto || undefined,
+    importe: Number(item.importe ?? 0),
+    importeTotal: item.importeTotal != null ? Number(item.importeTotal) : undefined,
+    importeCuota: item.importeCuota != null ? Number(item.importeCuota) : undefined,
+    importeAdelanto: item.importeAdelanto != null ? Number(item.importeAdelanto) : undefined,
   };
-};
+}
+
+function paymentMethodsFromCotizacion(apiRes: Qualification['api_res_data']): QualificationPaymentMethod[] {
+  const cot = apiRes?.cotizacion;
+  if (!cot) return [];
+  const raw = cot.facilidadesPago ?? cot.facilita_desPago ?? [];
+  return raw.map((row, idx) => normalizePaymentMethod(row, idx));
+}
+
+function displayPlanAmount(method: QualificationPaymentMethod): number {
+  if (method.cuotas <= 1) {
+    return method.importeTotal ?? method.importe;
+  }
+  return method.importeCuota ?? method.importe;
+}
 
 interface ResultProps {
   qualification: Qualification;
@@ -54,13 +55,19 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
   const statusId = qualification.status_id;
   const [copied, setCopied] = useState(false);
 
+  const buildConstanciaAprobacionUrl = (bailNumber: string): string => {
+    const normalized = bailNumber.trim();
+    const fileName = `Constancia_${normalized}.pdf`;
+    const encodedFileName = encodeURIComponent(fileName);
+
+    return `https://hoggax500.s3.us-east-1.amazonaws.com/Constancias_Aprobacion/${encodedFileName}`;
+  };
+
   const firstName = qualification?.api_res_data?.front?.nombre?.trim()?.split(/\s+/)[0] || '';
   const name = qualification?.api_res_data?.front?.nombre || '';
   const quoteValue = qualification?.api_res_data?.cotizacion?.costoServicio;
   const description = qualification?.api_res_data?.cotizacion?.legales;
-  const paymentMethods = (qualification?.api_res_data?.cotizacion?.facilita_desPago || []).filter(
-    (p: PaymentMethod) => p.visible
-  );
+  const paymentMethods = paymentMethodsFromCotizacion(qualification.api_res_data).filter((p) => p.visible);
   const agent = qualification?.api_res_data?.front?.agente;
 
   const formatArs = (value: number | undefined | null): string => {
@@ -70,7 +77,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
 
   const copyWhatsAppSummary = () => {
     const cot = qualification?.api_res_data?.cotizacion;
-    const methods: PaymentMethod[] = cot?.facilita_desPago || [];
+    const methods = paymentMethodsFromCotizacion(qualification.api_res_data).filter((m) => m.visible);
 
     const findByCuotas = (n: number) => methods.find((m) => m.cuotas === n);
     const transfer = findByCuotas(0) || methods.find((m) => /transfer/i.test(m.subTexto || ''));
@@ -79,22 +86,32 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
     const plan12 = findByCuotas(12);
     const plan24 = findByCuotas(24);
 
-    const montoAlquiler = formatArs(cot?.costoServicio);
-    const precioTransferencia = formatArs(transfer?.importeTotal || transfer?.importe);
-    const valorCuota3 = formatArs(plan3?.importe);
-    const total3Cuotas = formatArs(plan3?.importe);
-    const valorCuota12 = formatArs(plan12?.importe);
-    const total12Cuotas = formatArs(plan12?.importe);
-    const valorCuotaPlan = formatArs(plan24?.importe);
-    const totalPlan = formatArs(plan24?.importe);
+    const montoAlquiler = formatArs(cot?.alquiler ?? cot?.costoServicio);
+    const expensas = cot?.expensas ?? 0;
+    const expensasTexto =
+      expensas > 0
+        ? `y expensas iniciales de ${formatArs(expensas)}`
+        : 'sin expensas iniciales';
+
+    const plazoAnios = cot?.plazo ?? 0;
+    const plazoContratoMeses = plazoAnios > 0 ? String(plazoAnios * 12) : '—';
+
+    const precioTransferencia = formatArs(transfer?.importeTotal ?? transfer?.importe);
+    const valorCuota3 = formatArs(plan3?.importeCuota ?? plan3?.importe);
+    const total3Cuotas = formatArs(plan3?.importeTotal ?? plan3?.importe);
+    const valorCuota12 = formatArs(plan12?.importeCuota ?? plan12?.importe);
+    const total12Cuotas = formatArs(plan12?.importeTotal ?? plan12?.importe);
+    const adelanto = formatArs(plan24?.importeAdelanto ?? 0);
+    const valorCuotaPlan = formatArs(plan24?.importeCuota ?? plan24?.importe);
+    const totalPlan = formatArs(plan24?.importeTotal ?? plan24?.importe);
 
     const lines = [
       `Hola ${firstName},`,
       '',
       'Te compartimos la cotización de tu garantía Hoggax:',
       '',
-      `Corresponde a un alquiler mensual de ${montoAlquiler}.`,
-      'Valor final con IVA incluido por un contrato de 24 meses.',
+      `Corresponde a un alquiler mensual de ${montoAlquiler} ${expensasTexto}.`,
+      `Valor final con IVA incluido por un contrato de ${plazoContratoMeses} meses.`,
       '',
       'Opciones de pago:',
       '',
@@ -110,6 +127,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
       `Total: ${total12Cuotas}`,
       '',
       '• 24 cuotas:',
+      `Adelanto: ${adelanto}`,
       `${valorCuotaPlan} por cuota`,
       `Total: ${totalPlan}`,
       '',
@@ -198,7 +216,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                       </div>
                       <div className="text-right flex-shrink-0">
                         <p className="font-bold text-[var(--primary)] text-2xl leading-tight mb-0">
-                          {formatArs(method.importe)}
+                          {formatArs(displayPlanAmount(method))}
                         </p>
                         {method.cuotas > 1 && (
                           <p className="text-gray-500 text-sm mb-0">por cuota</p>
@@ -219,15 +237,24 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                   >
                     {copied ? 'Copiado al portapapeles' : 'Copiar resumen para WhatsApp'}
                   </button>
-                  {qualification.id && (
+                  {qualification.bail_number?.trim() ? (
                     <a
-                      href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/web/v1/qualifications/${qualification.id}/certificate`}
+                      href={buildConstanciaAprobacionUrl(qualification.bail_number)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-5 py-3 bg-[var(--primary)] text-white rounded-full font-bold hover:bg-[var(--primary-hover)] transition-colors text-center"
                     >
                       Descargar certificado
                     </a>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled
+                      className="px-5 py-3 bg-gray-300 text-gray-600 rounded-full font-bold cursor-not-allowed text-center"
+                      title="Todavía no hay constancia disponible (falta bail_number)"
+                    >
+                      Descargar certificado
+                    </button>
                   )}
                 </div>
               )}
