@@ -7,12 +7,17 @@ const Footer = () => (
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-8 lg:grid-cols-4 lg:gap-6">
         <div className="text-left">
           <a href="https://hoggax.com" target="_blank" rel="noopener noreferrer" className="inline-block">
-            <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em' }}>
-              <span style={{ color: footerText }}>hogg</span>
-              <span style={{ color: 'var(--primary)' }}>ax</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/hoggax-logo.svg"
+              alt="Hoggax"
+              className="footer-hoggax-logo block h-7 w-auto max-w-[min(100%,148px)] sm:h-8 sm:max-w-[160px]"
+              width={160}
+              height={41}
+            />
           </a>
           <p
+            className="max-w-prose text-pretty"
             style={{
               color: footerText,
               fontWeight: 600,
@@ -55,6 +60,7 @@ const Footer = () => (
                 href="https://maps.google.com/?q=Av.+Córdoba+1255+piso+8,+CABA,+Argentina"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="break-words"
                 style={{ color: footerText, textDecoration: 'underline' }}
               >
                 Av. Córdoba 1255 piso 8, CABA, Argentina

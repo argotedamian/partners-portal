@@ -47,14 +47,14 @@ export function HomeClient() {
     <div className="min-h-screen flex flex-col">
       <main className="bg-[var(--app-lilac)] flex-1">
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex flex-col lg:flex-row lg:gap-10 lg:items-start">
-            <div className="flex flex-col min-w-0 flex-1 pt-6 pb-4 lg:py-6 lg:sticky lg:top-16">
-              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-label mb-4 lg:mb-5">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-10 lg:items-start">
+            <div className="flex flex-col min-w-0 flex-1 pt-5 pb-2 sm:pt-6 sm:pb-4 lg:py-6 lg:sticky lg:top-16">
+              <h1 className="text-xl font-extrabold text-label sm:text-2xl lg:text-3xl xl:text-4xl text-pretty mb-3 sm:mb-4 lg:mb-5">
                 Partners
               </h1>
             </div>
 
-            <div className="w-full lg:w-[400px] xl:w-[460px] flex-shrink-0 lg:py-6 pb-8">
+            <div className="w-full min-w-0 lg:w-[400px] xl:w-[460px] flex-shrink-0 pb-6 sm:pb-8 lg:py-6">
               <Form onComplete={setQualification} />
             </div>
           </div>

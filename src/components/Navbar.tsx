@@ -31,7 +31,14 @@ export function Navbar() {
         <div className="navbar-inner navbar-inner--auth">
           <div className="navbar-auth-left">
             <Link href="/?reset=1" className="navbar-auth-brand" aria-label="Hoggax — inicio">
-              <span className="navbar-auth-wordmark">hoggax</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/hoggax-logo.svg"
+                alt="Hoggax"
+                className="navbar-auth-logo"
+                width={160}
+                height={41}
+              />
             </Link>
             <span className="navbar-auth-sep" aria-hidden="true">
               |
