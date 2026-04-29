@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Qualification, QualificationPaymentMethod } from '@/lib/quotation.api';
+import { useAppState } from '@/state/AppStateContext';
+import { selectQualification } from '@/state/appState.selectors';
 
 function coerceRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
@@ -47,13 +49,16 @@ function displayPlanAmount(method: QualificationPaymentMethod): number {
 }
 
 interface ResultProps {
-  qualification: Qualification;
+  qualification?: Qualification;
   isPartners?: boolean;
 }
 
-export function Result({ qualification, isPartners = false }: ResultProps) {
-  const statusId = qualification.status_id;
+export function Result({ qualification: qualificationProp, isPartners = false }: ResultProps) {
+  const state = useAppState();
   const [copied, setCopied] = useState(false);
+  const qualification = qualificationProp ?? selectQualification(state);
+  if (!qualification) return null;
+  const statusId = qualification.status_id;
 
   const buildConstanciaAprobacionUrl = (bailNumber: string): string => {
     const normalized = bailNumber.trim();
@@ -66,7 +71,6 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
   const firstName = qualification?.api_res_data?.front?.nombre?.trim()?.split(/\s+/)[0] || '';
   const name = qualification?.api_res_data?.front?.nombre || '';
   const quoteValue = qualification?.api_res_data?.cotizacion?.costoServicio;
-  const description = qualification?.api_res_data?.cotizacion?.legales;
   const paymentMethods = paymentMethodsFromCotizacion(qualification.api_res_data).filter((p) => p.visible);
   const agent = qualification?.api_res_data?.front?.agente;
 

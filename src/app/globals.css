@@ -547,9 +547,10 @@ body {
 }
 
 .gender-segment-btn.is-active {
-  border-color: rgba(255, 54, 108, 0.55);
-  background: #eef0ff;
-  box-shadow: 0 0 0 2px rgba(255, 54, 108, 0.12);
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 54, 108, 0.18);
 }
 
 .phone-grid {

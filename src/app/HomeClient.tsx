@@ -1,33 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster } from 'sonner';
 import { Form } from '@/components/form';
 import { Result } from '@/components/result';
 import Footer from '@/components/Footer';
 import { HomeMainLeftPanel, HomeMainRightPanel } from '@/components/home-main-panels';
-import type { Qualification } from '@/lib/quotation.api';
+import { useHomeState } from '@/hooks/useHomeState';
 
 export function HomeClient() {
-  const [qualification, setQualification] = useState<Qualification | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [advisorEmail, setAdvisorEmail] = useState('');
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const { isMounted, qualification, advisorEmail, setAdvisorEmail, setQualification } = useHomeState();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!searchParams) return;
-    if (!searchParams.get('reset')) return;
-    setQualification(null);
-    router.replace('/');
-  }, [router, searchParams]);
-
-  if (!mounted) {
+  if (!isMounted) {
     return <div className="min-h-screen bg-[var(--app-lilac)]" />;
   }
 
@@ -35,7 +18,7 @@ export function HomeClient() {
     return (
       <div className="min-h-screen flex flex-col">
         <main className="flex-1">
-          <Result qualification={qualification} isPartners={true} />
+          <Result isPartners={true} />
         </main>
         <div>
           <Footer />

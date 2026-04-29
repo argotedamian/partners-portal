@@ -1,18 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-
-/**
- * Mock hasta integrar autenticación real.
- * Cambiar a `true` para previsualizar la barra con usuario.
- */
-const MOCK_IS_AUTHENTICATED = false;
-
-/** Mock: datos del asesor (nombre o etiqueta mostrada a la derecha) */
-const MOCK_DATOS_ASESOR = 'Datos del asesor';
+import { useNavbarState } from '@/hooks/useNavbarState';
 
 export function Navbar() {
-  if (!MOCK_IS_AUTHENTICATED) {
+  const { isAuthenticated, advisorLabel, partnerLogoSrc } = useNavbarState();
+
+  if (!isAuthenticated) {
     return (
       <>
         <nav className="navbar-host navbar-host--guest" aria-label="Principal">
@@ -45,7 +39,7 @@ export function Navbar() {
             </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/logo-partner-mock.svg"
+              src={partnerLogoSrc}
               alt="Logo del partner"
               className="navbar-auth-partner-logo"
               width={122}
@@ -54,7 +48,7 @@ export function Navbar() {
           </div>
 
           <div className="navbar-auth-right">
-            <span className="navbar-auth-advisor">{MOCK_DATOS_ASESOR}</span>
+            <span className="navbar-auth-advisor">{advisorLabel}</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/user-logo.svg"

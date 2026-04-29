@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { AppStateProvider } from "@/state/AppStateContext";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -63,8 +64,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-white font-sans antialiased" suppressHydrationWarning>
-        <Navbar />
-        {children}
+        <AppStateProvider>
+          <Navbar />
+          {children}
+        </AppStateProvider>
       </body>
     </html>
   );
