@@ -6,11 +6,13 @@ import { Toaster } from 'sonner';
 import { Form } from '@/components/form';
 import { Result } from '@/components/result';
 import Footer from '@/components/Footer';
+import { HomeMainLeftPanel, HomeMainRightPanel } from '@/components/home-main-panels';
 import type { Qualification } from '@/lib/quotation.api';
 
 export function HomeClient() {
   const [qualification, setQualification] = useState<Qualification | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [advisorEmail, setAdvisorEmail] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -35,7 +37,7 @@ export function HomeClient() {
         <main className="flex-1">
           <Result qualification={qualification} isPartners={true} />
         </main>
-        <div className="mt-auto">
+        <div>
           <Footer />
         </div>
         <Toaster position="top-right" />
@@ -45,23 +47,18 @@ export function HomeClient() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="bg-[var(--app-lilac)] flex-1">
-        <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex flex-col gap-6 lg:flex-row lg:gap-10 lg:items-start">
-            <div className="flex flex-col min-w-0 flex-1 pt-5 pb-2 sm:pt-6 sm:pb-4 lg:py-6 lg:sticky lg:top-16">
-              <h1 className="text-xl font-extrabold text-label sm:text-2xl lg:text-3xl xl:text-4xl text-pretty mb-3 sm:mb-4 lg:mb-5">
-                Partners
-              </h1>
-            </div>
-
-            <div className="w-full min-w-0 lg:w-[400px] xl:w-[460px] flex-shrink-0 pb-6 sm:pb-8 lg:py-6">
+      <main className="bg-white flex-1 py-3 sm:py-4 lg:flex lg:items-start lg:py-5">
+        <div className="mx-auto w-full max-w-[1536px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-2 xl:px-9 xl:py-2 2xl:px-14 2xl:py-3">
+          <div className="grid grid-cols-1 gap-6 md:gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,555px)] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-7 2xl:grid-cols-[minmax(0,1fr)_minmax(0,620px)]">
+            <HomeMainLeftPanel advisorEmail={advisorEmail} onAdvisorEmailChange={setAdvisorEmail} />
+            <HomeMainRightPanel>
               <Form onComplete={setQualification} />
-            </div>
+            </HomeMainRightPanel>
           </div>
         </div>
       </main>
 
-      <div className="mt-auto">
+      <div>
         <Footer />
       </div>
       <Toaster position="top-right" />

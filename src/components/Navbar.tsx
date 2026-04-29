@@ -6,7 +6,7 @@ import Link from 'next/link';
  * Mock hasta integrar autenticación real.
  * Cambiar a `true` para previsualizar la barra con usuario.
  */
-const MOCK_IS_AUTHENTICATED = true;
+const MOCK_IS_AUTHENTICATED = false;
 
 /** Mock: datos del asesor (nombre o etiqueta mostrada a la derecha) */
 const MOCK_DATOS_ASESOR = 'Datos del asesor';

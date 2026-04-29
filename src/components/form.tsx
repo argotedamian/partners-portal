@@ -147,14 +147,14 @@ export function Form({ onComplete }: FormProps) {
         term: 2,
         discount_code: '',
       },
-      agent_email: '',
+      agent_email: PARTNERS_AGENTS[0]?.email ?? '',
       send_agent_email_to_tenant: false,
       is_real_estate: false,
     },
   });
 
-  const employmentSituationId = watch('user_personal_data.employment_situation_id');
   const discountCode = watch('quotation.discount_code');
+  const selectedGenderId = watch('user_personal_data.gender_id');
 
   useEffect(() => {
     if (discountTimer.current) clearTimeout(discountTimer.current);
@@ -180,12 +180,6 @@ export function Form({ onComplete }: FormProps) {
   const onSubmit = async (data: FormValues) => {
     console.log('[Form] submit:', data);
     setIsLoading(true);
-
-    if (!data.agent_email) {
-      toast.error('Seleccionar un agente');
-      setIsLoading(false);
-      return;
-    }
 
     if (!data.quotation.rent || !data.quotation.expenses) {
       toast.error('Ingresá el alquiler y las expensas');
@@ -300,202 +294,13 @@ export function Form({ onComplete }: FormProps) {
   return (
     <div className="form-container">
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Partner */}
-        <div className="form-group">
-          <label>Usuario</label>
-          <select {...register('agent_email')}>
-            <option value="">Seleccionar usuario</option>
-            {PARTNERS_AGENTS.map((agent) => (
-              <option key={agent.email} value={agent.email}>
-                {agent.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <p className="tenant-caption">Datos del inquilino</p>
 
-        {/* Switches */}
-        <div className="form-switches">
-          <div className="switch-row">
-            <label className="toggle-switch">
-              <input type="checkbox" {...register('send_agent_email_to_tenant')} />
-              <span className="toggle-slider" />
-            </label>
-            <span>Enviar cotización al inquilino</span>
-          </div>
-        </div>
-
-        <hr className="form-divider" />
-
-        {/* Datos personales */}
         <fieldset>
-          <legend>Datos personales</legend>
-
-          {/* Tipo de documento */}
-          <div className="grid-fields">
-            <div className="form-group">
-              <DocTypeSelect
-                value={selectedDocType}
-                options={DOCUMENT_TYPES}
-                onChange={(id) => {
-                  setSelectedDocType(id);
-                  setValue('user_personal_data.document_type_id', id);
-                }}
-              />
-              {selectedDocType === 1 ? (
-                <Controller
-                  control={control}
-                  name="user_personal_data.document_value"
-                  render={({ field }) => (
-                    <IMaskInput
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      mask={[{ mask: '0.000.000' }, { mask: '00.000.000' }] as any}
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      dispatch={(appended: string, dyn: any) => {
-                        const digits = (dyn.value + appended).replace(/\D/g, '');
-                        return dyn.compiledMasks[digits.length > 7 ? 1 : 0];
-                      }}
-                      value={field.value ?? ''}
-                      onAccept={(val: string) => field.onChange(val)}
-                      inputRef={field.ref}
-                      onBlur={field.onBlur}
-                      name={field.name}
-                      placeholder="XX.XXX.XXX"
-                    />
-                  )}
-                />
-              ) : (
-                <input
-                  type="text"
-                  {...register('user_personal_data.document_value')}
-                  placeholder="Pasaporte"
-                />
-              )}
-            </div>
-
-            <div className="form-group">
-              <label>Género</label>
-              <select {...register('user_personal_data.gender_id', { valueAsNumber: true })}>
-                <option value="">Seleccionar</option>
-                {GENDERS.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Nombre y Apellido (cuando no es DNI) */}
-          {selectedDocType !== 1 && (
-            <div className="grid-fields">
-              <div className="form-group">
-                <label>Nombre</label>
-                <input type="text" {...register('user_personal_data.first_name')} />
-              </div>
-              <div className="form-group">
-                <label>Apellido</label>
-                <input type="text" {...register('user_personal_data.last_name')} />
-              </div>
-            </div>
-          )}
-
-          {/* Contacto */}
-          <div className="grid-fields">
-            <div className="form-group">
-              <label>Celular</label>
-              <Controller
-                control={control}
-                name="user_personal_data.phone"
-                render={({ field }) => (
-                  <IMaskInput
-                    mask="+{54} 00 0000-0000"
-                    value={field.value ?? ''}
-                    onAccept={(val: string) => field.onChange(val)}
-                    inputRef={field.ref}
-                    onBlur={field.onBlur}
-                    name={field.name}
-                    placeholder="+54 11 1234-5678"
-                  />
-                )}
-              />
-            </div>
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                {...register('user_personal_data.email')}
-                placeholder="email@ejemplo.com"
-              />
-            </div>
-          </div>
-
-          {/* Situación laboral */}
-          <div className="form-group">
-            <label>Situación laboral</label>
-            <select {...register('user_personal_data.employment_situation_id', { valueAsNumber: true })}>
-              <option value="">Seleccionar</option>
-              {EMPLOYMENT_SITUATIONS.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Antigüedad e ingresos (excepto estudiante) */}
-          {employmentSituationId !== 1 && (
-            <div className="grid-fields">
-              <div className="form-group">
-                <label>Antigüedad</label>
-                <select {...register('user_personal_data.antiquity_id', { valueAsNumber: true })}>
-                  <option value="">Seleccionar</option>
-                  {ANTIQUITIES.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Ingresos mensuales</label>
-                <Controller
-                  control={control}
-                  name="user_personal_data.monthly_income"
-                  render={({ field }) => (
-                    <div className="price-field">
-                      <span className="price-prefix">$</span>
-                      <IMaskInput
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        mask={Number as any}
-                        scale={0}
-                        thousandsSeparator="."
-                        radix=","
-                        normalizeZeros={false}
-                        value={field.value !== null && field.value !== undefined ? String(field.value) : ''}
-                        onAccept={(_val: unknown, maskRef: { unmaskedValue: string }) => {
-                          const raw = maskRef.unmaskedValue;
-                          field.onChange(raw ? parseInt(raw, 10) : null);
-                        }}
-                        inputRef={field.ref}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                        placeholder="0"
-                      />
-                    </div>
-                  )}
-                />
-              </div>
-            </div>
-          )}
-        </fieldset>
-
-        {/* Cotización */}
-        <fieldset>
-          <legend>Cotización</legend>
-
+          <legend className="form-section-title">Datos del alquiler</legend>
           <div className="grid-fields-three">
             <div className="form-group">
-              <label>Alquiler</label>
+              <label>Alquiler <span className="required-star">*</span></label>
               <Controller
                 control={control}
                 name="quotation.rent"
@@ -524,7 +329,7 @@ export function Form({ onComplete }: FormProps) {
               />
             </div>
             <div className="form-group">
-              <label>Expensas</label>
+              <label>Expensas <span className="required-star">*</span></label>
               <Controller
                 control={control}
                 name="quotation.expenses"
@@ -553,7 +358,7 @@ export function Form({ onComplete }: FormProps) {
               />
             </div>
             <div className="form-group">
-              <label>Plazo</label>
+              <label>Duración <span className="required-star">*</span></label>
               <select {...register('quotation.term', { valueAsNumber: true })}>
                 {TERMS.map((t) => (
                   <option key={t.value} value={t.value}>
@@ -564,13 +369,12 @@ export function Form({ onComplete }: FormProps) {
             </div>
           </div>
 
-          {/* Cupón de descuento */}
           <div className="form-group">
             <label>Cupón de descuento</label>
             <input
               type="text"
               {...register('quotation.discount_code')}
-              placeholder="Código"
+              placeholder="Descuento"
             />
             {discountValidation.status === 'invalid' && (
               <span className="mt-2 flex items-center gap-2 text-sm font-bold text-[var(--primary)]">
@@ -593,10 +397,159 @@ export function Form({ onComplete }: FormProps) {
           </div>
         </fieldset>
 
-        {/* Submit */}
+        <fieldset>
+          <legend className="form-section-title">Datos labores</legend>
+          <div className="grid-fields">
+            <div className="form-group">
+              <label>Situación laboral <span className="required-star">*</span></label>
+              <select {...register('user_personal_data.employment_situation_id', { valueAsNumber: true })}>
+                <option value="">Seleccioná la opción</option>
+                {EMPLOYMENT_SITUATIONS.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Antigüedad <span className="required-star">*</span></label>
+              <select {...register('user_personal_data.antiquity_id', { valueAsNumber: true })}>
+                <option value="">Seleccioná la opción</option>
+                {ANTIQUITIES.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Ingresos mensuales <span className="required-star">*</span></label>
+            <Controller
+              control={control}
+              name="user_personal_data.monthly_income"
+              render={({ field }) => (
+                <div className="price-field">
+                  <span className="price-prefix">$</span>
+                  <IMaskInput
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    mask={Number as any}
+                    scale={0}
+                    thousandsSeparator="."
+                    radix=","
+                    normalizeZeros={false}
+                    value={field.value !== null && field.value !== undefined ? String(field.value) : ''}
+                    onAccept={(_val: unknown, maskRef: { unmaskedValue: string }) => {
+                      const raw = maskRef.unmaskedValue;
+                      field.onChange(raw ? parseInt(raw, 10) : null);
+                    }}
+                    inputRef={field.ref}
+                    onBlur={field.onBlur}
+                    name={field.name}
+                    placeholder="0"
+                  />
+                </div>
+              )}
+            />
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend className="form-section-title">Datos personales</legend>
+
+          <div className="form-group">
+            <label>Documento de identidad <span className="required-star">*</span></label>
+            <div className="identity-grid">
+              <DocTypeSelect
+                value={selectedDocType}
+                options={DOCUMENT_TYPES}
+                onChange={(id) => {
+                  setSelectedDocType(id);
+                  setValue('user_personal_data.document_type_id', id);
+                }}
+              />
+              {selectedDocType === 1 ? (
+                <Controller
+                  control={control}
+                  name="user_personal_data.document_value"
+                  render={({ field }) => (
+                    <IMaskInput
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      mask={[{ mask: '0.000.000' }, { mask: '00.000.000' }] as any}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      dispatch={(appended: string, dyn: any) => {
+                        const digits = (dyn.value + appended).replace(/\D/g, '');
+                        return dyn.compiledMasks[digits.length > 7 ? 1 : 0];
+                      }}
+                      value={field.value ?? ''}
+                      onAccept={(val: string) => field.onChange(val)}
+                      inputRef={field.ref}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      placeholder="11.111.111"
+                    />
+                  )}
+                />
+              ) : (
+                <input
+                  type="text"
+                  {...register('user_personal_data.document_value')}
+                  placeholder="Pasaporte"
+                />
+              )}
+              <div className="gender-segment">
+                {GENDERS.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    className={`gender-segment-btn${selectedGenderId === g.id ? ' is-active' : ''}`}
+                    onClick={() => setValue('user_personal_data.gender_id', g.id, { shouldDirty: true })}
+                  >
+                    {g.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid-fields">
+            <div className="form-group">
+              <label>Correo electrónico <span className="required-star">*</span></label>
+              <input
+                type="email"
+                {...register('user_personal_data.email')}
+                placeholder="tuemail@hoggax.com"
+              />
+            </div>
+            <div className="form-group">
+              <label>Celular <span className="required-star">*</span></label>
+              <div className="phone-grid">
+                <input type="text" value="+54" readOnly />
+                <Controller
+                  control={control}
+                  name="user_personal_data.phone"
+                  render={({ field }) => (
+                    <IMaskInput
+                      mask="0000-0000"
+                      value={field.value ?? ''}
+                      onAccept={(val: string) => field.onChange(val)}
+                      inputRef={field.ref}
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      placeholder="1111-1111"
+                    />
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
         <div className="form-submit">
           <button type="submit" disabled={isLoading}>
-            {isLoading ? 'Cargando...' : 'Cotizar ahora'}
+            {isLoading ? 'Cargando...' : 'Cotizar'}
           </button>
         </div>
       </form>
