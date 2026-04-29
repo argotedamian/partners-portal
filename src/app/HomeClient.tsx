@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Toaster } from 'sonner';
 import { Form } from '@/components/form';
 import { Result } from '@/components/result';
-import { RiveAnimation } from '@/components/rive-animation';
 import Footer from '@/components/Footer';
 import type { Qualification } from '@/lib/quotation.api';
 
@@ -53,9 +52,6 @@ export function HomeClient() {
               <h1 className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-[#171717] mb-4 lg:mb-5">
                 Partners
               </h1>
-              <div className="min-h-[200px] flex flex-col justify-center">
-                <RiveAnimation name="09_personas_cocinando" />
-              </div>
             </div>
 
             <div className="w-full lg:w-[400px] xl:w-[460px] flex-shrink-0 lg:py-6 pb-8">

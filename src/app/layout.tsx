@@ -55,8 +55,6 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800&display=swap"
           rel="stylesheet"
         />
-        {/* Preload Rive for animations */}
-        <link rel="preload" href="/animations/rive/09_personas_cocinando.riv" as="fetch" crossOrigin="anonymous" />
       </head>
       <body className="min-h-screen bg-white text-gray-900 font-sans" suppressHydrationWarning>
         <Navbar />
