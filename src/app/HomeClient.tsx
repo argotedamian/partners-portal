@@ -49,7 +49,7 @@ export function HomeClient() {
         <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex flex-col lg:flex-row lg:gap-10 lg:items-start">
             <div className="flex flex-col min-w-0 flex-1 pt-6 pb-4 lg:py-6 lg:sticky lg:top-16">
-              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-[#171717] mb-4 lg:mb-5">
+              <h1 className="text-2xl lg:text-3xl xl:text-4xl font-extrabold text-label mb-4 lg:mb-5">
                 Partners
               </h1>
             </div>

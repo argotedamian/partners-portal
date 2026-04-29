@@ -1,129 +1,65 @@
 'use client';
 
-import { useState, useRef } from 'react';
 import Link from 'next/link';
 
-const NAV_LINKS = [
-  { label: 'Inquilinos', href: 'https://hoggax.com/inquilinos/', external: true },
-  { label: 'Empresas', href: 'https://hoggax.com/empresas/', external: true },
-  { label: 'Propiedades', href: 'https://propiedades.hoggax.com/', external: true },
-  { label: 'Seguros', href: 'https://hoggax.com/seguros/', external: true },
-];
+/**
+ * Mock hasta integrar autenticación real.
+ * Cambiar a `true` para previsualizar la barra con usuario.
+ */
+const MOCK_IS_AUTHENTICATED = true;
 
-const AYUDA_ITEMS = [
-  { label: 'Blog', href: 'https://hoggax.com/blog/blog_puerta_abierta/' },
-  { label: 'Preguntas Frecuentes', href: 'https://hoggax.com/preguntas/' },
-];
+/** Mock: datos del asesor (nombre o etiqueta mostrada a la derecha) */
+const MOCK_DATOS_ASESOR = 'Datos del asesor';
 
 export function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [ayudaOpen, setAyudaOpen] = useState(false);
-  const ayudaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  function openAyuda() {
-    if (ayudaTimer.current) clearTimeout(ayudaTimer.current);
-    setAyudaOpen(true);
-  }
-
-  function closeAyuda() {
-    ayudaTimer.current = setTimeout(() => setAyudaOpen(false), 120);
+  if (!MOCK_IS_AUTHENTICATED) {
+    return (
+      <>
+        <nav className="navbar-host navbar-host--guest" aria-label="Principal">
+          <div className="navbar-inner navbar-inner--guest">
+            <p className="navbar-guest-title">Cotizador de garantías</p>
+          </div>
+        </nav>
+        <div className="navbar-spacer" aria-hidden="true" />
+      </>
+    );
   }
 
   return (
     <>
-      <nav className="navbar-host">
-        <div className="navbar-inner">
-          {/* Brand */}
-          <Link href="/?reset=1" className="navbar-brand" aria-label="Hoggax">
+      <nav className="navbar-host navbar-host--auth" aria-label="Principal">
+        <div className="navbar-inner navbar-inner--auth">
+          <div className="navbar-auth-left">
+            <Link href="/?reset=1" className="navbar-auth-brand" aria-label="Hoggax — inicio">
+              <span className="navbar-auth-wordmark">hoggax</span>
+            </Link>
+            <span className="navbar-auth-sep" aria-hidden="true">
+              |
+            </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/hoggax-logo.svg" alt="Hoggax" className="navbar-logo" />
-            <strong className="navbar-badge">(partners)</strong>
-          </Link>
-
-          {/* Desktop links */}
-          <ul className="navbar-desktop-links">
-            {NAV_LINKS.map(({ label, href, external }) => (
-              <li key={href}>
-                {external ? (
-                  <a className="nav-link" href={href} target="_blank" rel="noopener noreferrer">
-                    {label}
-                  </a>
-                ) : (
-                  <a className="nav-link" href={href}>
-                    {label}
-                  </a>
-                )}
-              </li>
-            ))}
-
-            {/* Ayuda dropdown */}
-            <li className="nav-dropdown-wrapper" onMouseEnter={openAyuda} onMouseLeave={closeAyuda}>
-              <a
-                className="nav-link"
-                href="https://hoggax.com/preguntas/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Ayuda
-                <svg
-                  className="nav-dropdown-chevron"
-                  width="10"
-                  height="10"
-                  viewBox="0 0 12 12"
-                  aria-hidden="true"
-                >
-                  <path fill="currentColor" d="M6 8L1 3h10z" />
-                </svg>
-              </a>
-              {ayudaOpen && (
-                <div className="nav-dropdown-menu" onMouseEnter={openAyuda} onMouseLeave={closeAyuda}>
-                  {AYUDA_ITEMS.map(({ label, href }) => (
-                    <a
-                      key={href}
-                      className="nav-dropdown-item"
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </li>
-          </ul>
-
-          {/* Hamburger — mobile only */}
-          <button
-            className="navbar-hamburger"
-            aria-label="Abrir navegación"
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((o) => !o)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div className="navbar-mobile-menu">
-            {NAV_LINKS.map(({ label, href }) => (
-              <a key={href} className="navbar-mobile-link" href={href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
-                {label}
-              </a>
-            ))}
-            {AYUDA_ITEMS.map(({ label, href }) => (
-              <a key={href} className="navbar-mobile-link navbar-mobile-sub" href={href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>
-                {label}
-              </a>
-            ))}
+            <img
+              src="/logo-partner-mock.svg"
+              alt="Logo del partner"
+              className="navbar-auth-partner-logo"
+              width={122}
+              height={29}
+            />
           </div>
-        )}
-      </nav>
 
-      {/* Spacer para que el contenido no quede bajo el nav fixed */}
+          <div className="navbar-auth-right">
+            <span className="navbar-auth-advisor">{MOCK_DATOS_ASESOR}</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/user-logo.svg"
+              alt=""
+              className="navbar-auth-user-img"
+              width={31}
+              height={31}
+              aria-hidden={true}
+            />
+          </div>
+        </div>
+      </nav>
       <div className="navbar-spacer" aria-hidden="true" />
     </>
   );

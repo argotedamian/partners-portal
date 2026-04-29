@@ -162,7 +162,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                 <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
                   Tu cotización está lista
                 </h2>
-                <p className="text-4xl sm:text-5xl text-gray-900">
+                <p className="text-4xl sm:text-5xl text-label">
                   Mirá el <strong className="font-extrabold">valor del servicio</strong>{' '}
                   y los planes de pago disponibles.
                 </p>
@@ -172,7 +172,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                 <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
                   ¡Felicitaciones {name}!
                 </h2>
-                <p className="text-4xl sm:text-5xl text-gray-900">
+                <p className="text-4xl sm:text-5xl text-label">
                   Tu garantía Hoggax de alquiler{' '}
                   <strong className="font-extrabold">está aprobada</strong>
                 </p>
@@ -200,16 +200,16 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                       }`}
                     >
                       <div className="flex-1 min-w-0 pr-2">
-                        <p className="font-bold text-lg leading-tight text-gray-900 mb-0">
+                        <p className="font-bold text-lg leading-tight text-label mb-0">
                           {method.texto}
                         </p>
                         {method.subTexto && (
-                          <p className="text-gray-500 text-sm leading-tight mb-0">
+                          <p className="text-label/70 text-sm leading-tight mb-0">
                             {method.subTexto}
                           </p>
                         )}
                         {method.infoTexto && (
-                          <p className="text-gray-500 text-sm leading-tight mb-0">
+                          <p className="text-label/70 text-sm leading-tight mb-0">
                             {method.infoTexto}
                           </p>
                         )}
@@ -219,7 +219,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                           {formatArs(displayPlanAmount(method))}
                         </p>
                         {method.cuotas > 1 && (
-                          <p className="text-gray-500 text-sm mb-0">por cuota</p>
+                          <p className="text-label/70 text-sm mb-0">por cuota</p>
                         )}
                       </div>
                     </div>
@@ -250,7 +250,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
                     <button
                       type="button"
                       disabled
-                      className="px-5 py-3 bg-gray-300 text-gray-600 rounded-full font-bold cursor-not-allowed text-center"
+                      className="px-5 py-3 bg-gray-300 text-label/75 rounded-full font-bold cursor-not-allowed text-center"
                       title="Todavía no hay constancia disponible (falta bail_number)"
                     >
                       Descargar certificado
@@ -276,7 +276,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
               <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
                 {name ? `${name} ` : ''}¡Ya casi está!
               </h2>
-              <p className="text-xl text-gray-900">
+              <p className="text-xl text-label">
                 Para ofrecerte una garantía necesitaremos validar tu documentación e ingresos.
               </p>
             </div>
@@ -286,7 +286,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
         {/* Sección inferior — lilac */}
         <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
           <div className="max-w-6xl mx-auto px-4">
-            <p className="text-xl text-gray-900">
+            <p className="text-xl text-label">
               {agent ? (
                 <strong className="font-bold">{agent.nombre}</strong>
               ) : (
@@ -294,12 +294,12 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
               )}{' '}
               te va a contactar para asesorarte con tu garantía.
             </p>
-            <p className="text-lg text-gray-900 mt-3">
+            <p className="text-lg text-label mt-3">
               <strong className="font-bold">
                 Vas a recibir un email con las instrucciones para completar el proceso.
               </strong>
             </p>
-            <p className="text-gray-600 mt-2">
+            <p className="text-label/75 mt-2">
               Si no lo recibís en tu bandeja de entrada te sugerimos que revises
               la carpeta de correo no deseado.
             </p>
@@ -320,7 +320,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
               <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
                 {name ? `${name} ` : ''}¡Ya casi está!
               </h2>
-              <p className="text-xl text-gray-900">
+              <p className="text-xl text-label">
                 Para que podamos emitir tu garantía, Hoggax solo{' '}
                 <strong className="font-bold">
                   necesitamos sumar a otra persona a tu solicitud
@@ -334,7 +334,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
         {/* Sección inferior — lilac */}
         <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
           <div className="max-w-6xl mx-auto px-4">
-            <p className="text-xl text-gray-900">
+            <p className="text-xl text-label">
               {agent ? (
                 <strong className="font-bold">{agent.nombre}</strong>
               ) : (
@@ -355,20 +355,20 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 className="text-2xl sm:text-3xl mb-4 text-gray-900">
+              <h2 className="text-2xl sm:text-3xl mb-4 text-label">
                 {name ? `${name}, encontramos` : 'Encontramos'} información incorrecta.
               </h2>
-              <p className="text-xl text-gray-900">
+              <p className="text-xl text-label">
                 Por esta razón, no nos es posible continuar.
               </p>
             </div>
             <div>
-              <p className="text-xl text-gray-900">
+              <p className="text-xl text-label">
                 <strong className="font-bold">
                   Algunos de los datos que ingresaste no nos permite validar tu identidad.
                 </strong>
               </p>
-              <p className="text-lg text-gray-900 mt-2">
+              <p className="text-lg text-label mt-2">
                 Volvé a intentarlo revisando la información ingresada o comunícate
                 con un asesor por WhatsApp.
               </p>
@@ -396,23 +396,23 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 items-center">
             <div>
-              <h2 className="text-2xl sm:text-3xl mb-4 text-gray-900">
+              <h2 className="text-2xl sm:text-3xl mb-4 text-label">
                 Oops!
               </h2>
-              <p className="text-xl text-gray-900">
+              <p className="text-xl text-label">
                 Ocurrió un error y no pudimos procesar tu solicitud.
               </p>
             </div>
             <div>
-              <p className="text-xl text-gray-900">
+              <p className="text-xl text-label">
                 <strong className="font-bold">Tuvimos un desperfecto técnico.</strong>
               </p>
-              <p className="text-lg text-gray-900 mt-2">
+              <p className="text-lg text-label mt-2">
                 No te preocupes, procesaremos tu solicitud nuevamente en forma
                 automática y nos pondremos en contacto con vos cuando tu solicitud sea
                 aprobada.
               </p>
-              <p className="text-lg text-gray-900 mt-2">
+              <p className="text-lg text-label mt-2">
                 Te pedimos disculpas por las demoras. Muchas gracias por confiar en
                 Hoggax para obtener tu garantía.
               </p>
@@ -430,7 +430,7 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
       <section className="py-8 sm:py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="lg:w-1/2 lg:pr-12">
-            <h2 className="text-4xl sm:text-5xl text-gray-900 leading-snug">
+            <h2 className="text-4xl sm:text-5xl text-label leading-snug">
               {name ? `${name}, no` : 'No'} podemos ofrecerte una garantía.
             </h2>
           </div>
@@ -442,11 +442,11 @@ export function Result({ qualification, isPartners = false }: ResultProps) {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-8 items-start">
             <div>
-              <p className="text-xl text-gray-900 font-bold">
+              <p className="text-xl text-label font-bold">
                 Desafortunadamente no contás con los requisitos mínimos para
                 solicitar nuestra garantía.
               </p>
-              <p className="text-lg text-gray-700 mt-2">
+              <p className="text-lg text-label/85 mt-2">
                 Si tenés más consultas, podés ver nuestra sección de Preguntas Frecuentes.
               </p>
             </div>

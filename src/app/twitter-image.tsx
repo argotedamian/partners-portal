@@ -49,7 +49,7 @@ export default function TwitterImage() {
             <div style={{ fontSize: 64, fontWeight: 900, color: "#0F0054", lineHeight: 1.05 }}>
               Hoggax Partners
             </div>
-            <div style={{ fontSize: 32, fontWeight: 700, color: "#171717", marginTop: 18 }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: "#0F0054", marginTop: 18 }}>
               Portal de cotización
             </div>
           </div>
