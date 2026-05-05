@@ -8,7 +8,7 @@ import { HomeMainLeftPanel, HomeMainRightPanel } from '@/components/home-main-pa
 import { useHomeState } from '@/hooks/useHomeState';
 
 export function HomeClient() {
-  const { isMounted, qualification, advisorEmail, setAdvisorEmail, setQualification } = useHomeState();
+  const { isMounted, qualification, advisorEmail, partner, advisorEmailValidation, setAdvisorEmail, setQualification } = useHomeState();
 
   if (!isMounted) {
     return <div className="min-h-screen bg-[var(--app-lilac)]" />;
@@ -33,7 +33,13 @@ export function HomeClient() {
       <main className="bg-white flex-1 py-3 sm:py-4 lg:flex lg:items-start lg:py-5">
         <div className="mx-auto w-full max-w-[1536px] px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-2 xl:px-9 xl:py-2 2xl:px-14 2xl:py-3">
           <div className="grid grid-cols-1 gap-6 md:gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,555px)] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-7 2xl:grid-cols-[minmax(0,1fr)_minmax(0,620px)]">
-            <HomeMainLeftPanel advisorEmail={advisorEmail} onAdvisorEmailChange={setAdvisorEmail} />
+            <HomeMainLeftPanel
+              advisorEmail={advisorEmail}
+              partnerLogoSrc={partner?.logo ?? null}
+              isCeBrokersPartner={partner?.email?.toLowerCase().endsWith('@cebrokers.com') ?? false}
+              advisorEmailValidation={advisorEmailValidation}
+              onAdvisorEmailChange={setAdvisorEmail}
+            />
             <HomeMainRightPanel>
               <Form onComplete={setQualification} />
             </HomeMainRightPanel>

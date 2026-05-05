@@ -5,6 +5,7 @@ export const initialAppState: AppState = {
     isAuthenticated: false,
     advisorLabel: 'Datos del asesor',
     partnerLogoSrc: '/logo-partner-mock.svg',
+    partner: null,
   },
   quotation: {
     qualification: null,
@@ -31,6 +32,14 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         session: {
           ...state.session,
           advisorLabel: action.payload,
+        },
+      };
+    case 'session/setPartner':
+      return {
+        ...state,
+        session: {
+          ...state.session,
+          partner: action.payload,
         },
       };
     case 'quotation/setQualification':

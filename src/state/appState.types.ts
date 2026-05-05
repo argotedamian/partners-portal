@@ -4,6 +4,12 @@ export type SessionState = {
   isAuthenticated: boolean;
   advisorLabel: string;
   partnerLogoSrc: string;
+  partner: {
+    fullname: string;
+    email: string;
+    logo: string;
+    comision: number;
+  } | null;
 };
 
 export type QuotationState = {
@@ -24,6 +30,7 @@ export type AppState = {
 export type AppStateAction =
   | { type: 'session/setAuthenticated'; payload: boolean }
   | { type: 'session/setAdvisorLabel'; payload: string }
+  | { type: 'session/setPartner'; payload: SessionState['partner'] }
   | { type: 'quotation/setQualification'; payload: Qualification | null }
   | { type: 'quotation/resetQualification' }
   | { type: 'quotation/setAdvisorEmail'; payload: string }

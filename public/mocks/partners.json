@@ -1,0 +1,14 @@
+[
+  {
+    "fullname": "Agustín Pérez",
+    "email": "agustin.perez@cebrokers.com",
+    "logo": "/CE-BROKERS.png",
+    "comision": 12.5
+  },
+  {
+    "fullname": "Valentina Gómez",
+    "email": "valentina.gomez@mob.com",
+    "logo": "/MOB.png",
+    "comision": 8
+  }
+]
