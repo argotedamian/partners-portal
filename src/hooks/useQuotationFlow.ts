@@ -17,6 +17,141 @@ import {
   validateDiscountCode,
 } from '@/lib/quotation.api';
 import type { Qualification } from '@/lib/quotation.api';
+import { useAppDispatch } from '@/state/AppStateContext';
+
+function buildMockQualification(params: {
+  rent: number;
+  expenses: number;
+  term: number;
+  discountCode?: string;
+  tenantEmail: string;
+  agentEmail: string;
+}): Qualification {
+  const { rent, expenses, term, discountCode, tenantEmail, agentEmail } = params;
+  const contractMonths = term * 12;
+
+  const base = Math.max(0, rent + expenses);
+  const hasDiscount = Boolean(discountCode);
+  const costoServicioRaw = Math.round(base * 0.65);
+
+  const now = Date.now();
+  const transferPrecioOriginal = Math.round(costoServicioRaw * 1.176); // usado como "precio tachado" en el diseño
+  const transferPrecioFinal = hasDiscount ? Math.round(transferPrecioOriginal * 0.85) : transferPrecioOriginal; // 15% off
+  const cft0 = 'CFT: 0%';
+  const cft12 = 'CFT: 14.41%';
+  const cftAdelanto = 'CFT: 16.93%';
+
+  const plan3Total = transferPrecioOriginal;
+  const plan3Cuota = Math.round(plan3Total / 3);
+
+  const plan12Total = Math.round(transferPrecioOriginal * 1.2325);
+  const plan12Cuota = Math.round(plan12Total / 12);
+
+  const adelantoTotalCuotas = term === 2 ? 24 : 36;
+  const cuotasDespuesAdelanto = adelantoTotalCuotas - 1;
+  const adelantoPct = 0.075;
+  const planAdelanto = Math.round(transferPrecioOriginal * adelantoPct);
+  const planAdelantoTotal = Math.round(transferPrecioOriginal * 1.308); // total con financiación (aprox)
+  const planAdelantoCuota = Math.round((planAdelantoTotal - planAdelanto) / cuotasDespuesAdelanto);
+
+  function moneyLine(label: string, value: number) {
+    return `${label}: ${formatCurrencyArs(value)}`;
+  }
+
+  function formatCurrencyArs(value: number) {
+    return `$${Number(value).toLocaleString('es-AR')}`;
+  }
+
+  const mockPaymentMethods = [
+    {
+      _id: 'pm_transfer',
+      orden: 1,
+      cuotas: 0,
+      visible: true,
+      destacado: true,
+      texto: 'Transferencia',
+      subTexto: 'Transferencia',
+      precioTexto: 'total',
+      infoTexto: hasDiscount
+        ? `15% off · ${moneyLine('Precio final', transferPrecioFinal)} · ${cft0}`
+        : `${moneyLine('Precio final', transferPrecioFinal)} · ${cft0}`,
+      importe: transferPrecioOriginal,
+      importeTotal: transferPrecioOriginal,
+    },
+    {
+      _id: 'pm_3',
+      orden: 2,
+      cuotas: 3,
+      visible: true,
+      texto: '3 cuotas sin interés',
+      subTexto: 'Crédito o Débito',
+      precioTexto: 'cuotas',
+      infoTexto: `${moneyLine('Precio final', plan3Total)} · ${cft0}`,
+      importe: plan3Cuota,
+      importeCuota: plan3Cuota,
+      importeTotal: plan3Total,
+    },
+    {
+      _id: 'pm_12',
+      orden: 3,
+      cuotas: 12,
+      visible: true,
+      texto: '12 cuotas',
+      subTexto: 'Crédito o Débito',
+      precioTexto: 'cuotas',
+      infoTexto: `${moneyLine('Precio final', plan12Total)} · ${cft12}`,
+      importe: plan12Cuota,
+      importeCuota: plan12Cuota,
+      importeTotal: plan12Total,
+    },
+    {
+      _id: 'pm_24',
+      orden: 4,
+      cuotas: term === 2 ? 24 : 36,
+      visible: true,
+      texto: term === 2 ? `7,5% adel. + ${cuotasDespuesAdelanto} cuotas` : `7,5% adel. + ${cuotasDespuesAdelanto} cuotas`,
+      subTexto: 'Crédito o Débito',
+      precioTexto: 'cuotas',
+      infoTexto: `${moneyLine('Precio adel.', planAdelanto)} · ${moneyLine('Precio final', planAdelantoTotal)} · ${cftAdelanto}`,
+      importeAdelanto: planAdelanto,
+      importe: planAdelantoCuota,
+      importeCuota: planAdelantoCuota,
+      importeTotal: planAdelantoTotal,
+    },
+  ];
+
+  return {
+    status_id: 4,
+    is_quotation_only: true,
+    id: now,
+    bail_number: `MOCK-${now}`,
+    pipedrive_id: now,
+    quotation_id: now,
+    api_res_data: {
+      idHoggax: now,
+      front: {
+        nombre: tenantEmail.split('@')[0] ?? 'Mock',
+        agente: {
+          nombre: agentEmail,
+          email: agentEmail,
+          telefono: '',
+          foto: null,
+        },
+      },
+      cotizacion: {
+        alquiler: rent,
+        expensas: expenses,
+        plazo: term,
+        costoServicio: transferPrecioOriginal,
+        costoServicioRaw: transferPrecioOriginal,
+        legales: `Mock — contrato ${contractMonths} meses`,
+        facilidadesPago: mockPaymentMethods,
+        discount: hasDiscount ? 15 : 0,
+        discountRef: discountCode ? 1 : null,
+      },
+    },
+  };
+}
 
 export type PersonalData = {
   document_type_id: number;
@@ -59,6 +194,7 @@ function normalizeNullableNumber(value: number | null): number | null {
 }
 
 export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
+  const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDocType, setSelectedDocType] = useState(1);
   const [discountValidation, setDiscountValidation] = useState<Awaited<ReturnType<typeof validateDiscountCode>>>({
@@ -181,7 +317,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         ...(document_type_id === 2 ? { first_name, last_name } : {}),
       };
 
-      qualification = await createQualification({
+      const qualificationRequest = {
         user_personal_data: personalData,
         quotation: {
           rent: data.quotation.rent,
@@ -195,7 +331,21 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         origin_channel_id: 431,
         agent_email: data.agent_email,
         send_agent_email_to_tenant: data.send_agent_email_to_tenant,
-      });
+      } as const;
+
+      dispatch({ type: 'quotation/setDraft', payload: { qualificationRequest } });
+
+      const shouldUseMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT === '1';
+      qualification = shouldUseMock
+        ? buildMockQualification({
+            rent: data.quotation.rent,
+            expenses: data.quotation.expenses,
+            term: data.quotation.term,
+            discountCode: data.quotation.discount_code || undefined,
+            tenantEmail: data.user_personal_data.email,
+            agentEmail: agent?.email ?? data.agent_email,
+          })
+        : await createQualification(qualificationRequest);
       toast.success('Calificación procesada');
 
       if ([4, 5].includes(qualification.status_id)) {

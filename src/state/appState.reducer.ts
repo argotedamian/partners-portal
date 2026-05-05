@@ -10,6 +10,7 @@ export const initialAppState: AppState = {
   quotation: {
     qualification: null,
     advisorEmail: '',
+    draft: null,
   },
   ui: {
     isMounted: false,
@@ -56,6 +57,7 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         quotation: {
           ...state.quotation,
           qualification: null,
+          draft: null,
         },
       };
     case 'quotation/setAdvisorEmail':
@@ -64,6 +66,14 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         quotation: {
           ...state.quotation,
           advisorEmail: action.payload,
+        },
+      };
+    case 'quotation/setDraft':
+      return {
+        ...state,
+        quotation: {
+          ...state.quotation,
+          draft: action.payload,
         },
       };
     case 'ui/setMounted':
