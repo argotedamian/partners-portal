@@ -13,7 +13,6 @@ import {
 } from '@/lib/constants';
 import {
   createQualification,
-  createQuotation,
   notifyFianzaAprobacionWebhook,
   validateDiscountCode,
 } from '@/lib/quotation.api';
@@ -44,7 +43,6 @@ export type FormValues = {
   quotation: Quotation;
   agent_email: string;
   send_agent_email_to_tenant: boolean;
-  is_real_estate: boolean;
 };
 
 type UseQuotationFlowParams = {
@@ -89,8 +87,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         discount_code: '',
       },
       agent_email: PARTNERS_AGENTS[0]?.email ?? '',
-      send_agent_email_to_tenant: false,
-      is_real_estate: false,
+      send_agent_email_to_tenant: false
     },
   });
 
@@ -132,86 +129,77 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
       const { document_value, document_type_id, first_name, last_name } = data.user_personal_data;
       const agent = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
 
-      const shouldQualify = !!document_value && (document_type_id === 1 || (document_type_id === 2 && !!first_name && !!last_name));
-
       let qualification: Qualification;
 
-      if (shouldQualify) {
-        const normalizedGenderId = normalizeNullableNumber(data.user_personal_data.gender_id);
-        const normalizedEmploymentSituationId = normalizeNullableNumber(data.user_personal_data.employment_situation_id);
-        const normalizedAntiquityId = normalizeNullableNumber(data.user_personal_data.antiquity_id);
-        const normalizedMonthlyIncome = normalizeNullableNumber(data.user_personal_data.monthly_income);
+      if (!document_value?.trim()) {
+        toast.error('Ingresá el documento de identidad');
+        return;
+      }
 
-        if (!normalizedGenderId) {
-          toast.error('Seleccioná el género');
+      if (document_type_id === 2 && (!first_name?.trim() || !last_name?.trim())) {
+        toast.error('Ingresá nombre y apellido');
+        return;
+      }
+
+      const normalizedGenderId = normalizeNullableNumber(data.user_personal_data.gender_id);
+      const normalizedEmploymentSituationId = normalizeNullableNumber(data.user_personal_data.employment_situation_id);
+      const normalizedAntiquityId = normalizeNullableNumber(data.user_personal_data.antiquity_id);
+      const normalizedMonthlyIncome = normalizeNullableNumber(data.user_personal_data.monthly_income);
+
+      if (!normalizedGenderId) {
+        toast.error('Seleccioná el género');
+        return;
+      }
+
+      if (!normalizedEmploymentSituationId) {
+        toast.error('Seleccioná la situación laboral');
+        return;
+      }
+
+      if (normalizedEmploymentSituationId !== 1) {
+        if (!normalizedAntiquityId) {
+          toast.error('Seleccioná la antigüedad');
           return;
         }
-
-        if (!normalizedEmploymentSituationId) {
-          toast.error('Seleccioná la situación laboral');
+        if (!normalizedMonthlyIncome) {
+          toast.error('Ingresá los ingresos mensuales');
           return;
         }
+      }
 
-        if (normalizedEmploymentSituationId !== 1) {
-          if (!normalizedAntiquityId) {
-            toast.error('Seleccioná la antigüedad');
-            return;
-          }
-          if (!normalizedMonthlyIncome) {
-            toast.error('Ingresá los ingresos mensuales');
-            return;
-          }
-        }
+      const normalizedDocumentValue = document_type_id === 1 ? sanitizeNumericInput(document_value) : document_value.trim();
 
-        const normalizedDocumentValue = document_type_id === 1 ? sanitizeNumericInput(document_value) : document_value.trim();
+      const personalData = {
+        document_type_id,
+        document_value: normalizedDocumentValue,
+        gender_id: normalizedGenderId,
+        phone: sanitizeNumericInput(data.user_personal_data.phone),
+        email: data.user_personal_data.email,
+        employment_situation_id: normalizedEmploymentSituationId,
+        antiquity_id: normalizedEmploymentSituationId === 1 ? null : normalizedAntiquityId,
+        monthly_income: normalizedEmploymentSituationId === 1 ? null : normalizedMonthlyIncome,
+        ...(document_type_id === 2 ? { first_name, last_name } : {}),
+      };
 
-        const personalData = {
-          document_type_id,
-          document_value: normalizedDocumentValue,
-          gender_id: normalizedGenderId,
-          phone: sanitizeNumericInput(data.user_personal_data.phone),
-          email: data.user_personal_data.email,
-          employment_situation_id: normalizedEmploymentSituationId,
-          antiquity_id: normalizedEmploymentSituationId === 1 ? null : normalizedAntiquityId,
-          monthly_income: normalizedEmploymentSituationId === 1 ? null : normalizedMonthlyIncome,
-          ...(document_type_id === 2 ? { first_name, last_name } : {}),
-        };
+      qualification = await createQualification({
+        user_personal_data: personalData,
+        quotation: {
+          rent: data.quotation.rent,
+          expenses: data.quotation.expenses,
+          term: data.quotation.term,
+          discount_code: data.quotation.discount_code || undefined,
+          ref: 'Hoggax',
+        },
+        origin_id: 1,
+        is_partner: true,
+        origin_channel_id: 431,
+        agent_email: data.agent_email,
+        send_agent_email_to_tenant: data.send_agent_email_to_tenant,
+      });
+      toast.success('Calificación procesada');
 
-        qualification = await createQualification({
-          user_personal_data: personalData,
-          quotation: {
-            rent: data.quotation.rent,
-            expenses: data.quotation.expenses,
-            term: data.quotation.term,
-            discount_code: data.quotation.discount_code || undefined,
-            ref: 'partners-portal',
-          },
-          origin_id: 1,
-          is_partner: true,
-          agent_email: data.agent_email,
-          send_agent_email_to_tenant: data.send_agent_email_to_tenant,
-          is_real_estate: false,
-        });
-        toast.success('Calificación procesada');
-
-        if ([4, 5].includes(qualification.status_id)) {
-          void notifyFianzaAprobacionWebhook(qualification);
-        }
-      } else {
-        qualification = await createQuotation(
-          {
-            rent: data.quotation.rent,
-            expenses: data.quotation.expenses,
-            term: data.quotation.term,
-            discount_code: data.quotation.discount_code || undefined,
-            is_partner: true,
-            agent_email: data.agent_email,
-            contact_email: data.send_agent_email_to_tenant ? data.user_personal_data.email || undefined : undefined,
-          },
-          agent?.label,
-          agent?.phone,
-        );
-        toast.success('Cotización creada');
+      if ([4, 5].includes(qualification.status_id)) {
+        void notifyFianzaAprobacionWebhook(qualification);
       }
 
       onComplete(qualification);

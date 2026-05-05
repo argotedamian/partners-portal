@@ -225,6 +225,8 @@ export type QualificationRequest = {
     employment_situation_id: number | null;
     antiquity_id: number | null;
     monthly_income: number | null;
+    veraz_score?: number | null;
+    veraz_data?: unknown[] | null;
   };
   quotation: {
     rent: number;
@@ -233,11 +235,15 @@ export type QualificationRequest = {
     discount_code?: string;
     ref?: string;
   };
-  is_partner: true;
-  agent_email: string;
-  send_agent_email_to_tenant: boolean;
-  is_real_estate: boolean;
   origin_id: 1;
+  is_partner?: boolean;
+  selected_payment_method?: Record<string, unknown> | null;
+  risk_check_result?: Record<string, unknown> | null;
+  solofo?: boolean;
+  agent_email?: string;
+  send_agent_email_to_tenant?: boolean;
+  is_real_estate?: boolean;
+  origin_channel_id?: number;
 };
 
 type QualificationApiResponse = {
@@ -305,7 +311,7 @@ export async function validateDiscountCode(code: string): Promise<DiscountValida
 export async function createQualification(body: QualificationRequest): Promise<Qualification> {
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   if (!baseUrl) throw new Error('Missing NEXT_PUBLIC_BACKEND_URL');
-  const url = `${baseUrl}/api/web/v1/qualifications`;
+  const url = `${baseUrl}/api/web/v2/individual/qualifications`;
 
   const res = await fetch(url, {
     method: 'POST',
