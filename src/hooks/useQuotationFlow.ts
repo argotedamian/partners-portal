@@ -176,6 +176,7 @@ export type PersonalData = {
   document_type_id: number;
   document_value: string;
   gender_id: number | null;
+  phone_country_code: string;
   phone: string;
   email: string;
   first_name: string;
@@ -230,6 +231,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         document_type_id: 1,
         document_value: '',
         gender_id: null,
+        phone_country_code: '+54',
         phone: '',
         email: '',
         first_name: '',
@@ -341,11 +343,15 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
 
       const normalizedDocumentValue = document_type_id === 1 ? sanitizeNumericInput(document_value) : document_value.trim();
 
+      const normalizedCountryCode = sanitizeNumericInput(data.user_personal_data.phone_country_code || '+54');
+      const normalizedPhoneLocal = sanitizeNumericInput(data.user_personal_data.phone);
+
       const personalData = {
         document_type_id,
         document_value: normalizedDocumentValue,
         gender_id: normalizedGenderId,
-        phone: sanitizeNumericInput(data.user_personal_data.phone),
+        phone_country_code: data.user_personal_data.phone_country_code,
+        phone: `${normalizedCountryCode}${normalizedPhoneLocal}`,
         email: data.user_personal_data.email,
         employment_situation_id: normalizedEmploymentSituationId,
         antiquity_id:

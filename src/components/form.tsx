@@ -468,25 +468,37 @@ export function Form({ onComplete }: FormProps) {
             <div className="form-group">
               <label>Celular <span className="required-star">*</span></label>
               <div className="phone-grid">
-                <input type="text" value="+54" readOnly />
+                <input
+                  type="tel"
+                  aria-label="Código de país"
+                  {...register('user_personal_data.phone_country_code', {
+                    validate: (val) => {
+                      const digits = String(val ?? '').replace(/\D/g, '');
+                      return digits.length >= 1 ? true : 'Ingresá el código de país';
+                    },
+                  })}
+                  placeholder="+54"
+                  autoComplete="tel-country-code"
+                  inputMode="tel"
+                />
                 <Controller
                   control={control}
                   name="user_personal_data.phone"
                   rules={{
                     validate: (val) => {
                       const digits = String(val ?? '').replace(/\D/g, '');
-                      return digits.length >= 8 || 'Ingresá el celular';
+                      return digits.length === 10 || 'Ingresá 10 dígitos (cód. de área + número)';
                     },
                   }}
                   render={({ field }) => (
                     <IMaskInput
-                      mask="0000-0000"
+                      mask="00-0000-0000"
                       value={field.value ?? ''}
                       onAccept={(val: string) => field.onChange(val)}
                       inputRef={field.ref}
                       onBlur={field.onBlur}
                       name={field.name}
-                      placeholder="1111-1111"
+                      placeholder="11-1111-1111"
                     />
                   )}
                 />

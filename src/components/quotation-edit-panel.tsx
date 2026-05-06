@@ -14,6 +14,7 @@ type EditValues = {
   expenses: number | null;
   term: number;
   discountCode: string;
+  phoneCountryCode: string;
   phone: string;
   email: string;
 };
@@ -25,6 +26,15 @@ function formatArs(value: number | null | undefined): string {
 
 function sanitizeNumericInput(value: string): string {
   return value.replace(/\D/g, '');
+}
+
+function splitPhoneDigits(value: string): { phoneCountryCode: string; phoneLocal: string } {
+  const digits = sanitizeNumericInput(value ?? '');
+  if (!digits) return { phoneCountryCode: '+54', phoneLocal: '' };
+  if (digits.length <= 10) return { phoneCountryCode: '+54', phoneLocal: digits };
+  const local = digits.slice(-10);
+  const cc = digits.slice(0, -10);
+  return { phoneCountryCode: `+${cc}`, phoneLocal: local };
 }
 
 function normalizeDiscountCode(value: string): string | undefined {
@@ -106,15 +116,18 @@ export function QuotationEditPanel() {
     const expenses = coerceNumber(req?.quotation?.expenses ?? cot?.expensas ?? null);
     const term = coerceNumber(req?.quotation?.term ?? cot?.plazo ?? 2) ?? 2;
     const discountCode = String(req?.quotation?.discount_code ?? '');
-    const phone = String(req?.user_personal_data?.phone ?? '');
+    const phoneRaw = String(req?.user_personal_data?.phone ?? '');
     const email = String(req?.user_personal_data?.email ?? '');
+
+    const { phoneCountryCode, phoneLocal } = splitPhoneDigits(phoneRaw);
 
     return {
       rent,
       expenses,
       term,
       discountCode,
-      phone,
+      phoneCountryCode,
+      phone: phoneLocal,
       email,
     };
   }, [draft?.qualificationRequest, qualification?.api_res_data?.cotizacion]);
@@ -169,9 +182,15 @@ export function QuotationEditPanel() {
       return;
     }
 
-    const normalizedPhone = sanitizeNumericInput(values.phone);
-    if (!normalizedPhone) {
-      toast.error('Ingresá el celular');
+    const normalizedCountryCode = sanitizeNumericInput(values.phoneCountryCode || '+54');
+    if (!normalizedCountryCode) {
+      toast.error('Ingresá el código de país');
+      return;
+    }
+
+    const normalizedPhoneLocal = sanitizeNumericInput(values.phone);
+    if (normalizedPhoneLocal.length !== 10) {
+      toast.error('Ingresá 10 dígitos (cód. de área + número)');
       return;
     }
 
@@ -180,7 +199,7 @@ export function QuotationEditPanel() {
       user_personal_data: {
         ...baseRequest.user_personal_data,
         email: normalizedEmail,
-        phone: normalizedPhone,
+        phone: `${normalizedCountryCode}${normalizedPhoneLocal}`,
       },
       quotation: {
         ...baseRequest.quotation,
@@ -362,13 +381,21 @@ export function QuotationEditPanel() {
                     Celular <span className="required-star">*</span>
                   </label>
                   <div className="phone-grid">
-                    <input type="text" value="+54" readOnly aria-label="Código de país" />
+                    <input
+                      type="tel"
+                      value={values.phoneCountryCode}
+                      onChange={(e) => setValues((prev) => ({ ...prev, phoneCountryCode: e.target.value }))}
+                      aria-label="Código de país"
+                      placeholder="+54"
+                      autoComplete="tel-country-code"
+                      inputMode="tel"
+                    />
                     <IMaskInput
                       id="qe-phone"
-                      mask="0000-0000"
+                      mask="00-0000-0000"
                       value={values.phone ?? ''}
                       onAccept={(val: string) => setValues((prev) => ({ ...prev, phone: val }))}
-                      placeholder="1111-1111"
+                      placeholder="11-1111-1111"
                     />
                   </div>
                 </div>

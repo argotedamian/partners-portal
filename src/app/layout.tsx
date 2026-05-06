@@ -17,9 +17,23 @@ export const metadata: Metadata = {
   },
   description: "Portal de cotización de garantías Hoggax para partners.",
   applicationName: "Hoggax Partners",
+  keywords: ["Hoggax", "Partners", "garantía", "garantía de alquiler", "cotización"],
+  category: "finance",
+  creator: "Hoggax",
+  publisher: "Hoggax",
   alternates: {
     canonical: "/",
   },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: [{ url: "/favicon.ico", sizes: "any" }],
+    apple: [{ url: "/favicon.ico", sizes: "any" }],
+  },
+  manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",
     url: "https://partners.hoggax.com/",
@@ -27,11 +41,20 @@ export const metadata: Metadata = {
     title: "Hoggax Partners",
     description: "Portal de cotización de garantías Hoggax para partners.",
     locale: "es_AR",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Hoggax Partners",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Hoggax Partners",
     description: "Portal de cotización de garantías Hoggax para partners.",
+    images: ["/twitter-image"],
   },
   robots: {
     index: true,
