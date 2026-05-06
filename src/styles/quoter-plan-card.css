@@ -53,7 +53,7 @@
 
 .pp-quoter-plan-price {
   text-align: left;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .pp-quoter-plan-price-original {
@@ -68,45 +68,40 @@
 }
 
 .pp-quoter-plan-price-main {
-  line-height: 1;
-  display: inline-flex;
-  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
   color: var(--primary);
-  min-width: 0;
-  gap: 0.35rem;
   font-family: 'Nunito Sans', 'Calibri', sans-serif;
   font-weight: 800;
 }
 
-.pp-quoter-plan-price-main-currency {
-  font-size: 24px;
-  color: var(--primary);
-}
-
 .pp-quoter-plan-price-main-value {
-  font-size: clamp(2.25rem, 3vw, 2.75rem);
+  font-size: 34px;
   color: var(--primary);
   font-variant-numeric: tabular-nums;
+  line-height: 1.05;
 }
 
 .pp-quoter-plan-price-main-label {
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--primary);
-  margin-top: 0.25rem;
-  white-space: nowrap;
-  flex: 0 0 auto;
+  line-height: 1.1;
 }
 
 .pp-quoter-plan-divider {
-  border-top: 2px solid var(--primary);
-  margin: 1.25rem 0;
+  height: 2px;
   width: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  margin: 1.1rem 0 0.9rem;
 }
 
 .pp-quoter-plan-info {
   text-align: left;
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
   min-height: 7.25rem;
 }
 
@@ -129,10 +124,10 @@
 .pp-quoter-plan-final {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
   font-size: 14px;
   color: #837F9B;
-  margin-top: 0.75rem;
+  margin-top: 0.9rem;
   font-weight: 600;
 }
 
@@ -148,8 +143,9 @@
   color: var(--primary);
   font-family: 'Nunito Sans', 'Calibri', sans-serif;
   font-weight: 800;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.9rem;
   margin-top: auto;
+  text-align: center;
 }
 
 .pp-quoter-plan.is-selected .pp-quoter-plan-price-original {
@@ -182,6 +178,6 @@
   }
 
   .pp-quoter-plan-price-main-value {
-    font-size: 2.25rem;
+    font-size: 34px;
   }
 }

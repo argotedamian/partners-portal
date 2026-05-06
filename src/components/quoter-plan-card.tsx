@@ -60,6 +60,7 @@ export function QuoterPlanCard({ plan, offPercent = 0, quotationImporte = null, 
       : null;
 
   const mainPrice = computeMainPrice(plan, offPercent);
+  const formattedMain = Number.isFinite(mainPrice) ? mainPrice.toLocaleString('es-AR') : '-';
 
   const finalPriceTotal =
     plan.importeTotal ?? (plan.importe != null && !isCuota ? plan.importe : null);
@@ -114,18 +115,11 @@ export function QuoterPlanCard({ plan, offPercent = 0, quotationImporte = null, 
           )}
         </div>
 
-        <div
-          className={[
-            'pp-quoter-plan-price-main',
-            'inline-flex min-w-0 items-baseline gap-[6px] font-extrabold leading-none',
-            isSelected ? 'text-white' : 'text-[var(--primary)]',
-          ].join(' ')}
-        >
-          <span className="pp-quoter-plan-price-main-currency text-[24px]">$</span>
-          <span className="pp-quoter-plan-price-main-value text-[clamp(2.25rem,3vw,2.75rem)] [font-variant-numeric:tabular-nums]">
-            {Number.isFinite(mainPrice) ? mainPrice.toLocaleString('es-AR') : '-'}
+        <div className={['pp-quoter-plan-price-main', isSelected ? 'text-white' : 'text-[var(--primary)]'].join(' ')}>
+          <span className="pp-quoter-plan-price-main-value">
+            ${formattedMain}
           </span>
-          <span className="pp-quoter-plan-price-main-label mt-1 whitespace-nowrap text-[14px] font-bold">
+          <span className="pp-quoter-plan-price-main-label">
             {priceLabel}
           </span>
         </div>
@@ -134,7 +128,7 @@ export function QuoterPlanCard({ plan, offPercent = 0, quotationImporte = null, 
       {isFeatured ? (
         <div className="my-5 w-full border-t-2 border-white/30" aria-hidden="true" />
       ) : (
-        <div className="mt-3 h-[2px] w-[92px] rounded-full bg-[var(--primary)]" aria-hidden="true" />
+        <div className="pp-quoter-plan-divider" aria-hidden="true" />
       )}
 
       <div className="pp-quoter-plan-info mb-4 min-h-[7.25rem] text-left">

@@ -107,7 +107,7 @@ export function PartnersQuotationApproved({
 
             {paymentMethods.length > 0 && (
               <div className="mt-5" aria-label="Opciones de pago">
-                <div className="partners-result-cards mx-auto grid w-full max-w-[1100px] grid-cols-1 justify-center gap-4 sm:grid-cols-2 md:gap-5 xl:grid-cols-[300px_230px_230px_230px] xl:gap-4">
+                <div className="partners-result-cards px-4 sm:px-0">
                   {paymentMethods.slice(0, 4).map((method) => (
                     <QuoterPlanCard
                       key={method._id}
@@ -121,7 +121,7 @@ export function PartnersQuotationApproved({
               </div>
             )}
 
-            <p className="partners-result-fineprint mx-auto mt-4 max-w-[880px] text-[12px] font-bold text-label/45">
+            <p className="partners-result-fineprint mx-auto pt-10 max-w-[880px] text-[12px] font-bold text-label/45">
               Correspondiente a un alquiler mensual de {formatArs(alquiler)} y expensas de {formatArs(expensas)}.
               Valor final con IVA incluido por un contrato de {duracionAnios * 12} meses.
             </p>

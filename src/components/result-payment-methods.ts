@@ -28,11 +28,29 @@ export function normalizePaymentMethod(raw: unknown, idx: number): Qualification
   };
 }
 
+/**
+ * Igual que `web/src/app/services/http/quoter-http.service.ts` al mapear `facilidades_pago`:
+ * solo el primer plan con `destacado` en orden de lista conserva el flag; el resto pasa a `false`.
+ */
+function collapseDestacadoLikeWeb(methods: QualificationPaymentMethod[]): QualificationPaymentMethod[] {
+  let featured = false;
+  return methods.map((m) => {
+    const next = { ...m };
+    if (!featured) {
+      featured = Boolean(next.destacado);
+      return next;
+    }
+    next.destacado = false;
+    return next;
+  });
+}
+
 export function paymentMethodsFromCotizacion(apiRes: Qualification['api_res_data']): QualificationPaymentMethod[] {
   const cot = apiRes?.cotizacion;
   if (!cot) return [];
   const raw = cot.facilidadesPago ?? cot.facilita_desPago ?? [];
-  return raw.map((row, idx) => normalizePaymentMethod(row, idx));
+  const normalized = raw.map((row, idx) => normalizePaymentMethod(row, idx));
+  return collapseDestacadoLikeWeb(normalized);
 }
 
 export function displayPlanAmount(method: QualificationPaymentMethod): number {

@@ -75,6 +75,7 @@
   gap: 0.9rem;
   margin: 0.9rem auto 0.6rem;
   max-width: 980px;
+  justify-content: center;
 }
 
 .partners-result-card {
@@ -261,7 +262,8 @@
   }
 
   .partners-result-cards {
-    grid-template-columns: 1.25fr 1fr 1fr 1fr;
+    /* Mantener cards con ancho fijo y centradas (evita que “ocupen todo el ancho”). */
+    grid-template-columns: 300px 230px 230px 230px;
     align-items: stretch;
   }
 
