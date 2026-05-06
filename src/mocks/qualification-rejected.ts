@@ -17,9 +17,9 @@ type BuildRejectedParams = {
 export function buildMockQualificationRejected(params: BuildRejectedParams): Qualification {
   const { tenantEmail, agentEmail, variant = QualificationStatusId.Rejected } = params;
   const now = Date.now();
-  const tenantLocal = tenantEmail.split('@')[0] ?? 'usuario';
+  const tenantLocal = ((tenantEmail ?? '').trim().split('@')[0] ?? '').trim() || 'usuario';
   const nombre = tenantLocal.charAt(0).toUpperCase() + tenantLocal.slice(1);
-  const agentLocal = agentEmail.split('@')[0] ?? 'agente';
+  const agentLocal = ((agentEmail ?? '').trim().split('@')[0] ?? '').trim() || 'agente';
 
   const base = qualificationRejectedBase as Qualification;
 
@@ -36,7 +36,7 @@ export function buildMockQualificationRejected(params: BuildRejectedParams): Qua
         nombre,
         agente: {
           nombre: agentLocal.charAt(0).toUpperCase() + agentLocal.slice(1),
-          email: agentEmail,
+          email: agentEmail ?? '',
           telefono: '',
           foto: null,
         },

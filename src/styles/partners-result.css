@@ -432,3 +432,135 @@
 .qualification-rejected-cta-button:hover {
   background: var(--primary-hover);
 }
+
+/* ============================================
+   CALIFICACIÓN DOCUMENTACIÓN PENDIENTE (status_id 6)
+   ============================================ */
+
+.partners-doc-pending-inner {
+  position: relative;
+}
+
+.partners-doc-pending-decor {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.partners-doc-pending-decor::before,
+.partners-doc-pending-decor::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 40%,
+    rgba(218, 219, 235, 0.55) 0%,
+    rgba(239, 240, 255, 0.2) 55%,
+    transparent 70%
+  );
+}
+
+.partners-doc-pending-decor::before {
+  width: min(420px, 90vw);
+  height: min(200px, 28vw);
+  left: -8%;
+  top: 4%;
+  opacity: 0.85;
+}
+
+.partners-doc-pending-decor::after {
+  width: min(320px, 70vw);
+  height: min(160px, 22vw);
+  right: -5%;
+  top: 18%;
+  opacity: 0.7;
+}
+
+.partners-doc-pending-title {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: clamp(1.55rem, 4.2vw, 2.4rem);
+  line-height: 1.18;
+  font-weight: 900;
+}
+
+.partners-doc-pending-lead {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.partners-doc-pending-cards {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1080px;
+}
+
+.partners-doc-pending-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(15, 0, 84, 0.1);
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 0, 84, 0.04);
+  padding: 1.15rem 1rem 1.35rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .partners-doc-pending-card {
+    padding: 1.25rem 1.1rem 1.5rem;
+  }
+}
+
+.partners-doc-pending-card-title {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: clamp(0.72rem, 1.65vw, 0.82rem);
+  font-weight: 900;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--label-color);
+}
+
+.partners-doc-pending-card-sub {
+  margin: 0.45rem 0 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: rgba(15, 0, 84, 0.52);
+}
+
+.partners-doc-pending-card-icon {
+  margin-top: auto;
+  padding-top: 1rem;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 112px;
+}
+
+.partners-doc-pending-card-icon img {
+  max-height: 108px;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.partners-doc-pending-button {
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.05rem;
+  background: var(--primary);
+  box-shadow: 0 2px 8px rgba(255, 54, 108, 0.25);
+}

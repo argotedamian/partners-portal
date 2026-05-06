@@ -10,8 +10,10 @@ type BuildIntermediateParams = {
   agentEmail: string;
 };
 
-function displayNameFromEmail(email: string, fallback: string): string {
-  const local = email.split('@')[0]?.trim() ?? fallback;
+function displayNameFromEmail(email: string | undefined | null, fallback: string): string {
+  const normalized = (email ?? '').trim();
+  if (!normalized) return fallback;
+  const local = normalized.split('@')[0]?.trim() ?? '';
   if (!local) return fallback;
   return local.charAt(0).toUpperCase() + local.slice(1);
 }
@@ -41,7 +43,7 @@ export function buildMockQualificationIntermediate(
         nombre,
         agente: {
           nombre: agentNombre,
-          email: params.agentEmail,
+          email: params.agentEmail ?? '',
           telefono: '',
           foto: null,
         },

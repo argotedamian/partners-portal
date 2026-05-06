@@ -13,6 +13,10 @@ import {
   TERMS,
 } from '@/lib/constants';
 import {
+  alignQualificationStatusForPassport,
+  getPassportAlignedStatusId,
+} from '@/lib/passport-qualification-alignment';
+import {
   createQualification,
   notifyFianzaAprobacionWebhook,
   validateDiscountCode,
@@ -143,10 +147,10 @@ function buildMockQualification(params: {
     api_res_data: {
       idHoggax: now,
       front: {
-        nombre: tenantEmail.split('@')[0] ?? 'Mock',
+        nombre: ((tenantEmail ?? '').trim().split('@')[0] ?? '').trim() || 'Mock',
         agente: {
-          nombre: agentEmail,
-          email: agentEmail,
+          nombre: agentEmail ?? '',
+          email: agentEmail ?? '',
           telefono: '',
           foto: null,
         },
@@ -349,18 +353,34 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
 
       const mockMode = parseQualificationMockMode(process.env.NEXT_PUBLIC_USE_MOCK_RESULT);
 
+      const passportAlignmentInput = {
+        document_type_id,
+        employment_situation_id: normalizedEmploymentSituationId,
+        rent: data.quotation.rent,
+        expenses: data.quotation.expenses,
+      };
+
       if (mockMode === null) {
         qualification = await createQualification(qualificationRequest);
+        qualification = alignQualificationStatusForPassport(qualification, passportAlignmentInput);
         toast.success('Calificación procesada');
       } else if (mockMode === QualificationMockMode.ApprovedQuotation) {
-        qualification = buildMockQualification({
-          rent: data.quotation.rent,
-          expenses: data.quotation.expenses,
-          term: data.quotation.term,
-          discountCode: data.quotation.discount_code || undefined,
-          tenantEmail: data.user_personal_data.email,
-          agentEmail: agent?.email ?? data.agent_email,
-        });
+        const passportOutcome = getPassportAlignedStatusId(passportAlignmentInput);
+        if (passportOutcome === QualificationStatusId.AlmostApproved) {
+          qualification = buildMockQualificationIntermediate(QualificationStatusId.AlmostApproved, {
+            tenantEmail: data.user_personal_data.email,
+            agentEmail: agent?.email ?? data.agent_email,
+          });
+        } else {
+          qualification = buildMockQualification({
+            rent: data.quotation.rent,
+            expenses: data.quotation.expenses,
+            term: data.quotation.term,
+            discountCode: data.quotation.discount_code || undefined,
+            tenantEmail: data.user_personal_data.email,
+            agentEmail: agent?.email ?? data.agent_email,
+          });
+        }
         toast.success('Calificación procesada');
       } else if (
         mockMode === QualificationMockMode.Rejected ||

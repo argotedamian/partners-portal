@@ -8,6 +8,7 @@ import { useAppState } from '@/state/AppStateContext';
 import { selectPartner, selectQualification } from '@/state/appState.selectors';
 import { QuotationEditPanel } from '@/components/quotation-edit-panel';
 import { PartnersQuotationApproved } from '@/components/partners-result/partners-quotation-approved';
+import { PartnersQualificationDocumentationPending } from '@/components/partners-result/partners-qualification-documentation-pending';
 import { PartnersQualificationRejected } from '@/components/partners-result/partners-qualification-rejected';
 import { displayPlanAmount, paymentMethodsFromCotizacion } from '@/components/result-payment-methods';
 
@@ -244,9 +245,14 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
 
   // Casi aprobado (status_id: 6) — pasaporte o documentación a validar
   if (statusId === 6) {
+    if (isPartners) {
+      return (
+        <PartnersQualificationDocumentationPending qualification={qualification} />
+      );
+    }
+
     return (
       <>
-        {/* Sección superior — blanco */}
         <section className="py-8 sm:py-12">
           <div className="max-w-6xl mx-auto px-4">
             <div className="lg:w-1/2 lg:pr-12">
@@ -260,7 +266,6 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
           </div>
         </section>
 
-        {/* Sección inferior — lilac */}
         <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
           <div className="max-w-6xl mx-auto px-4">
             <p className="text-xl text-label">
