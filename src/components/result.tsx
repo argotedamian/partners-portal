@@ -37,7 +37,6 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
   const name = qualification?.api_res_data?.front?.nombre || '';
   const quoteValue = qualification?.api_res_data?.cotizacion?.costoServicio;
   const paymentMethods = paymentMethodsFromCotizacion(qualification.api_res_data).filter((p) => p.visible);
-  const agent = qualification?.api_res_data?.front?.agente;
 
   const copyWhatsAppSummary = () => {
     const cot = qualification?.api_res_data?.cotizacion;
@@ -269,12 +268,7 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
         <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
           <div className="max-w-6xl mx-auto px-4">
             <p className="text-xl text-label">
-              {agent ? (
-                <strong className="font-bold">{agent.nombre}</strong>
-              ) : (
-                'Uno de nuestros agentes'
-              )}{' '}
-              te va a contactar para asesorarte con tu garantía.
+              Un Asesor te va a contactar para continuar con tu garantía.
             </p>
             <p className="text-lg text-label mt-3">
               <strong className="font-bold">
@@ -317,12 +311,7 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
         <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
           <div className="max-w-6xl mx-auto px-4">
             <p className="text-xl text-label">
-              {agent ? (
-                <strong className="font-bold">{agent.nombre}</strong>
-              ) : (
-                'Uno de nuestros agentes'
-              )}{' '}
-              te va a contactar para asesorarte con tu garantía.
+              Un Asesor te va a contactar para continuar con tu garantía.
             </p>
           </div>
         </section>
