@@ -131,7 +131,12 @@ export async function notifyFianzaAprobacionWebhook(qualification: Qualification
   try {
     await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      /**
+       * n8n (cloud) suele no permitir CORS para webhooks, y `application/json`
+       * dispara preflight. Con `no-cors` mandamos el request igual (respuesta opaca).
+       */
+      mode: 'no-cors',
+      keepalive: true,
       body: JSON.stringify({ deal_id: dealId }),
       signal: controller.signal,
     });
