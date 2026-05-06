@@ -125,13 +125,12 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
 
     return (
       <section className="py-8 sm:py-12">
+        {isPartners && (
+          <div className="partners-result-editbar partners-result-editbar--full w-full px-4 sm:px-8 lg:px-12 mb-5 sm:mb-6">
+            <QuotationEditPanel />
+          </div>
+        )}
         <div className="max-w-6xl mx-auto px-4">
-          {isPartners && (
-            <div className="mb-5 sm:mb-6">
-              <QuotationEditPanel />
-            </div>
-          )}
-
           {/* Fila 1: título + descripción (50% izq en lg) — igual que col-60 col-lg-30 */}
           <div className="lg:w-1/2 lg:pr-12 mb-6">
             {qualification.is_quotation_only ? (

@@ -61,12 +61,12 @@ export function PartnersQuotationApproved({
   return (
     <div className="partners-result-approved overflow-x-hidden">
       <section className="partners-result-top py-5 sm:py-7">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="partners-result-editbar">
-            <QuotationEditPanel />
-          </div>
+        <div className="partners-result-editbar partners-result-editbar--full w-full px-4 sm:px-8 lg:px-12">
+          <QuotationEditPanel />
+        </div>
 
-          <div className="partners-result-hero text-center pt-3">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="partners-result-hero text-center pt-4 sm:pt-5">
             <h2 className="partners-result-title text-[var(--app-green)] font-extrabold text-[32px] leading-[1.05] sm:text-[44px]">
               Tu garantía Hoggax está aprobada.
             </h2>

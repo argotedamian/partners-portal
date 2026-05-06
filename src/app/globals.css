@@ -917,6 +917,51 @@ body {
 
 .quotation-edit-host {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Transición abrir/cerrar editor (View Transitions API; Chrome / Edge / Safari 18+) */
+@supports (view-transition-name: none) {
+  .quotation-edit-host {
+    view-transition-name: quotation-edit-panel;
+  }
+}
+
+::view-transition-old(quotation-edit-panel),
+::view-transition-new(quotation-edit-panel) {
+  animation-duration: 0.42s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(quotation-edit-panel) {
+  animation-name: quotation-edit-vt-fade-slide-out;
+}
+
+::view-transition-new(quotation-edit-panel) {
+  animation-name: quotation-edit-vt-fade-slide-in;
+}
+
+@keyframes quotation-edit-vt-fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes quotation-edit-vt-fade-slide-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(quotation-edit-panel),
+  ::view-transition-new(quotation-edit-panel) {
+    animation-duration: 0.01ms !important;
+    animation-name: none !important;
+  }
 }
 
 .quotation-edit-summary {
@@ -924,10 +969,13 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   background: #f9fbff;
   border: 1px solid rgba(15, 0, 84, 0.10);
   border-radius: 0.85rem;
-  padding: 0.65rem 0.75rem;
+  padding: 0.7rem 0.9rem 0.7rem 1rem;
 }
 
 .quotation-edit-items {
@@ -1000,72 +1048,162 @@ body {
   box-shadow: 0 0 0 3px rgba(255, 54, 108, 0.12);
 }
 
-.quotation-edit-collapsible {
-  overflow: hidden;
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-4px);
-  transition: max-height 0.25s ease, opacity 0.18s ease, transform 0.25s ease;
+/* Panel expandido: reemplaza la barra (no se muestran ambos a la vez) */
+.quotation-edit-expanded-shell {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 0, 84, 0.08);
+  background: linear-gradient(180deg, #eef3fe 0%, #f3f5ff 55%, #eef3fe 100%);
+  box-shadow: 0 4px 24px rgba(15, 0, 84, 0.06);
+  /* Aire respecto al borde lavanda + contenido interno */
+  padding: 1.35rem 1rem 1.65rem;
 }
 
-.quotation-edit-collapsible.is-open {
-  max-height: 520px;
-  opacity: 1;
-  transform: translateY(0);
+/* Navegadores sin View Transitions: entrada suave al abrir */
+@supports not (view-transition-name: none) {
+  .quotation-edit-expanded-shell {
+    animation: quotation-edit-fallback-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes quotation-edit-fallback-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
-.quotation-edit-panel {
-  margin-top: 0.6rem;
-  padding: 0.85rem;
-  background: white;
-  border-radius: 1rem;
-  border: 1px solid rgba(15, 0, 84, 0.10);
+@media (prefers-reduced-motion: reduce) {
+  .quotation-edit-expanded-shell {
+    animation: none !important;
+  }
 }
 
-.quotation-edit-actions {
+@media (min-width: 640px) {
+  .quotation-edit-expanded-shell {
+    padding: 1.5rem 1.35rem 1.85rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .quotation-edit-expanded-shell {
+    padding: 1.65rem 1.75rem 2rem;
+  }
+}
+
+.quotation-edit-expanded-head {
   display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 0.6rem;
-  margin-top: 0.75rem;
+  align-items: center;
+  min-height: 2rem;
+  margin-bottom: 0.35rem;
 }
 
-.quotation-edit-cancel {
-  padding: 0.55rem 0.95rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(15, 0, 84, 0.18);
-  background: white;
-  color: var(--label-color);
-  font-family: 'Nunito Sans', 'Calibri', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 800;
+.quotation-edit-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0 -0.35rem 0 0;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: rgba(15, 0, 84, 0.38);
+  font-size: 1.65rem;
+  font-weight: 400;
+  line-height: 1;
   cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 
-.quotation-edit-submit {
-  padding: 0.55rem 1.05rem;
-  border-radius: 9999px;
+.quotation-edit-close:hover:not(:disabled) {
+  color: rgba(15, 0, 84, 0.65);
+  background: rgba(15, 0, 84, 0.05);
+}
+
+.quotation-edit-close:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Misma base que el formulario principal (form.tsx): .form-container + .price-field + .phone-grid */
+.quotation-edit-expanded-shell .form-container.quotation-edit-expanded-form {
+  margin-top: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Leyendas un poco más proporcionadas en el panel (el principal usa 2rem fijo) */
+.quotation-edit-expanded-form .form-section-title {
+  font-size: clamp(1.2rem, 2.8vw, 1.65rem);
+  margin-bottom: 0.55rem !important;
+}
+
+.quotation-edit-edit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.25rem;
+  align-items: stretch;
+}
+
+.quotation-edit-coupon-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.quotation-edit-submit--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.62rem 1.15rem;
+  border-radius: 0.6rem;
   border: none;
   background: var(--primary);
-  color: white;
+  color: #fff;
   font-family: 'Nunito Sans', 'Calibri', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 900;
   cursor: pointer;
   transition: background 0.15s ease;
 }
 
-.quotation-edit-submit:hover:not(:disabled) {
+.quotation-edit-submit--primary:hover:not(:disabled) {
   background: var(--primary-hover);
 }
 
-.quotation-edit-cancel:disabled,
-.quotation-edit-submit:disabled {
-  opacity: 0.6;
+.quotation-edit-submit--primary:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
 @media (min-width: 640px) {
+  .quotation-edit-edit-actions {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+
+  .quotation-edit-coupon-field {
+    max-width: min(100%, 340px);
+  }
+
+  .quotation-edit-submit--primary {
+    width: auto;
+    min-width: 220px;
+  }
+
   .quotation-edit-items {
     grid-template-columns: 1fr auto 1fr auto 1fr;
     align-items: center;
@@ -1099,6 +1237,11 @@ body {
 
 .partners-result-editbar {
   margin-bottom: 0.85rem;
+}
+
+.partners-result-editbar--full {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .partners-result-hero {

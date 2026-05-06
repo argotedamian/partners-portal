@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { IMaskInput } from 'react-imask';
 import { toast } from 'sonner';
 import { TERMS } from '@/lib/constants';
@@ -56,6 +57,37 @@ function PencilIcon() {
   );
 }
 
+function runQuotationEditTransition(updateDom: () => void) {
+  if (typeof document === 'undefined') {
+    updateDom();
+    return;
+  }
+  const doc = document as Document & {
+    startViewTransition?: (callback: () => void) => { finished: Promise<void> };
+  };
+  if (typeof doc.startViewTransition === 'function') {
+    doc.startViewTransition(() => {
+      flushSync(updateDom);
+    });
+  } else {
+    updateDom();
+  }
+}
+
+function ArrowRightIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5 12h14M13 5l7 7-7 7"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function QuotationEditPanel() {
   const state = useAppState();
   const dispatch = useAppDispatch();
@@ -101,12 +133,21 @@ export function QuotationEditPanel() {
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key !== 'Escape') return;
-      setIsExpanded(false);
-      setValues(initialValues);
+      runQuotationEditTransition(() => {
+        setIsExpanded(false);
+        setValues(initialValues);
+      });
     }
     if (isExpanded) document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [initialValues, isExpanded]);
+
+  function closeExpanded() {
+    runQuotationEditTransition(() => {
+      setIsExpanded(false);
+      setValues(initialValues);
+    });
+  }
 
   const termLabel = TERMS.find((t) => t.value === values.term)?.name ?? `${values.term} años`;
 
@@ -156,7 +197,9 @@ export function QuotationEditPanel() {
       const nextQualification = await createQualification(patchedRequest);
       dispatch({ type: 'quotation/setQualification', payload: nextQualification });
       toast.success('Cotización actualizada');
-      setIsExpanded(false);
+      runQuotationEditTransition(() => {
+        setIsExpanded(false);
+      });
     } catch (error) {
       console.error('[QuotationEditPanel] error:', error);
       toast.error('Error al recalcular. Intentá de nuevo.');
@@ -166,162 +209,197 @@ export function QuotationEditPanel() {
   }
 
   return (
-    <section className="quotation-edit-host" aria-label="Editar cotización">
-      <div className="quotation-edit-summary">
-        <div className="quotation-edit-items" aria-label="Resumen de cotización">
-          <div className="quotation-edit-item">
-            <span className="quotation-edit-label">Alquiler inicial</span>
-            <span className="quotation-edit-value">{formatArs(values.rent)}</span>
+    <section
+      className={`quotation-edit-host${isExpanded ? ' quotation-edit-host--expanded' : ''}`}
+      aria-label="Editar cotización"
+    >
+      {!isExpanded ? (
+        <div className="quotation-edit-summary">
+          <div className="quotation-edit-items" aria-label="Resumen de cotización">
+            <div className="quotation-edit-item">
+              <span className="quotation-edit-label">Alquiler inicial</span>
+              <span className="quotation-edit-value">{formatArs(values.rent)}</span>
+            </div>
+            <span className="quotation-edit-sep" aria-hidden="true" />
+            <div className="quotation-edit-item">
+              <span className="quotation-edit-label">Expensas</span>
+              <span className="quotation-edit-value">{formatArs(values.expenses)}</span>
+            </div>
+            <span className="quotation-edit-sep" aria-hidden="true" />
+            <div className="quotation-edit-item">
+              <span className="quotation-edit-label">Duración</span>
+              <span className="quotation-edit-value">{termLabel}</span>
+            </div>
           </div>
-          <span className="quotation-edit-sep" aria-hidden="true" />
-          <div className="quotation-edit-item">
-            <span className="quotation-edit-label">Expensas</span>
-            <span className="quotation-edit-value">{formatArs(values.expenses)}</span>
-          </div>
-          <span className="quotation-edit-sep" aria-hidden="true" />
-          <div className="quotation-edit-item">
-            <span className="quotation-edit-label">Duración</span>
-            <span className="quotation-edit-value">{termLabel}</span>
-          </div>
+
+          <button
+            type="button"
+            className="quotation-edit-button"
+            onClick={() =>
+              runQuotationEditTransition(() => {
+                setIsExpanded(true);
+              })
+            }
+            aria-expanded={false}
+            aria-controls="quotation-edit-expanded-panel"
+            id="quotation-edit-open-button"
+          >
+            <PencilIcon />
+          </button>
         </div>
-
-        <button
-          type="button"
-          className="quotation-edit-button"
-          onClick={() => setIsExpanded((prev) => !prev)}
-          aria-expanded={isExpanded}
+      ) : (
+        <div
+          className="quotation-edit-expanded-shell"
+          id="quotation-edit-expanded-panel"
+          role="region"
+          aria-label="Formulario de edición de cotización"
         >
-          <PencilIcon />
-        </button>
-      </div>
-
-      <div className={`quotation-edit-collapsible${isExpanded ? ' is-open' : ''}`}>
-        <div className="quotation-edit-panel">
-          <div className="grid-fields-three">
-            <div className="form-group">
-              <label>
-                Alquiler <span className="required-star">*</span>
-              </label>
-              <div className="price-field">
-                <span className="price-prefix">$</span>
-                <IMaskInput
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  mask={Number as any}
-                  scale={0}
-                  thousandsSeparator="."
-                  radix=","
-                  normalizeZeros={false}
-                  value={values.rent != null ? String(values.rent) : ''}
-                  inputRef={(node) => {
-                    firstInputRef.current = node;
-                  }}
-                  onAccept={(_val: unknown, maskRef: { unmaskedValue: string }) => {
-                    const raw = maskRef.unmaskedValue;
-                    setValues((prev) => ({ ...prev, rent: raw ? parseInt(raw, 10) : null }));
-                  }}
-                  placeholder="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>
-                Expensas <span className="required-star">*</span>
-              </label>
-              <div className="price-field">
-                <span className="price-prefix">$</span>
-                <IMaskInput
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  mask={Number as any}
-                  scale={0}
-                  thousandsSeparator="."
-                  radix=","
-                  normalizeZeros={false}
-                  value={values.expenses != null ? String(values.expenses) : ''}
-                  onAccept={(_val: unknown, maskRef: { unmaskedValue: string }) => {
-                    const raw = maskRef.unmaskedValue;
-                    setValues((prev) => ({ ...prev, expenses: raw ? parseInt(raw, 10) : null }));
-                  }}
-                  placeholder="0"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>
-                Duración <span className="required-star">*</span>
-              </label>
-              <select
-                value={values.term}
-                onChange={(e) => setValues((prev) => ({ ...prev, term: Number(e.target.value) }))}
-              >
-                {TERMS.map((t) => (
-                  <option key={t.value} value={t.value}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid-fields">
-            <div className="form-group">
-              <label>
-                Celular <span className="required-star">*</span>
-              </label>
-              <div className="phone-grid">
-                <input type="text" value="+54" readOnly />
-                <IMaskInput
-                  mask="0000-0000"
-                  value={values.phone ?? ''}
-                  onAccept={(val: string) => setValues((prev) => ({ ...prev, phone: val }))}
-                  placeholder="1111-1111"
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>
-                Email <span className="required-star">*</span>
-              </label>
-              <input
-                type="email"
-                value={values.email}
-                onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))}
-                placeholder="tuemail@hoggax.com"
-              />
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Cupón de descuento</label>
-            <input
-              type="text"
-              value={values.discountCode}
-              onChange={(e) => setValues((prev) => ({ ...prev, discountCode: e.target.value }))}
-              placeholder="Descuento"
-            />
-          </div>
-
-          <div className="quotation-edit-actions">
+          <div className="quotation-edit-expanded-head">
             <button
               type="button"
-              className="quotation-edit-cancel"
-              onClick={() => {
-                setIsExpanded(false);
-                setValues(initialValues);
-              }}
+              className="quotation-edit-close"
+              onClick={closeExpanded}
+              aria-label="Cerrar edición"
               disabled={isLoading}
             >
-              Cancelar
-            </button>
-            <button type="button" className="quotation-edit-submit" onClick={onRecalculate} disabled={isLoading}>
-              {isLoading ? 'Recalculando…' : 'Recalcular'}
+              ×
             </button>
           </div>
+
+          <div className="form-container quotation-edit-expanded-form">
+            <fieldset>
+              <legend className="form-section-title">Datos del alquiler</legend>
+              <div className="grid-fields-three">
+                <div className="form-group">
+                  <label htmlFor="qe-rent">
+                    Alquiler inicial <span className="required-star">*</span>
+                  </label>
+                  <div className="price-field">
+                    <span className="price-prefix">$</span>
+                    <IMaskInput
+                      id="qe-rent"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      mask={Number as any}
+                      scale={0}
+                      thousandsSeparator="."
+                      radix=","
+                      normalizeZeros={false}
+                      value={values.rent != null ? String(values.rent) : ''}
+                      inputRef={(node) => {
+                        firstInputRef.current = node;
+                      }}
+                      onAccept={(_val: unknown, maskRef: { unmaskedValue: string }) => {
+                        const raw = maskRef.unmaskedValue;
+                        setValues((prev) => ({ ...prev, rent: raw ? parseInt(raw, 10) : null }));
+                      }}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="qe-expenses">
+                    Expensas <span className="required-star">*</span>
+                  </label>
+                  <div className="price-field">
+                    <span className="price-prefix">$</span>
+                    <IMaskInput
+                      id="qe-expenses"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      mask={Number as any}
+                      scale={0}
+                      thousandsSeparator="."
+                      radix=","
+                      normalizeZeros={false}
+                      value={values.expenses != null ? String(values.expenses) : ''}
+                      onAccept={(_val: unknown, maskRef: { unmaskedValue: string }) => {
+                        const raw = maskRef.unmaskedValue;
+                        setValues((prev) => ({ ...prev, expenses: raw ? parseInt(raw, 10) : null }));
+                      }}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="qe-term">
+                    Duración <span className="required-star">*</span>
+                  </label>
+                  <select
+                    id="qe-term"
+                    value={values.term}
+                    onChange={(e) => setValues((prev) => ({ ...prev, term: Number(e.target.value) }))}
+                  >
+                    {TERMS.map((t) => (
+                      <option key={t.value} value={t.value}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend className="form-section-title">Datos personales</legend>
+              <div className="grid-fields">
+                <div className="form-group">
+                  <label htmlFor="qe-email">
+                    Correo electrónico <span className="required-star">*</span>
+                  </label>
+                  <input
+                    id="qe-email"
+                    type="email"
+                    value={values.email}
+                    onChange={(e) => setValues((prev) => ({ ...prev, email: e.target.value }))}
+                    placeholder="tuemail@hoggax.com"
+                    autoComplete="email"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="qe-phone">
+                    Celular <span className="required-star">*</span>
+                  </label>
+                  <div className="phone-grid">
+                    <input type="text" value="+54" readOnly aria-label="Código de país" />
+                    <IMaskInput
+                      id="qe-phone"
+                      mask="0000-0000"
+                      value={values.phone ?? ''}
+                      onAccept={(val: string) => setValues((prev) => ({ ...prev, phone: val }))}
+                      placeholder="1111-1111"
+                    />
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <div className="quotation-edit-edit-actions">
+              <div className="form-group quotation-edit-coupon-field mb-0">
+                <label htmlFor="qe-coupon">Cupón de descuento</label>
+                <input
+                  id="qe-coupon"
+                  type="text"
+                  value={values.discountCode}
+                  onChange={(e) => setValues((prev) => ({ ...prev, discountCode: e.target.value }))}
+                  placeholder="Descuento"
+                  autoComplete="off"
+                />
+              </div>
+              <button
+                type="button"
+                className="quotation-edit-submit quotation-edit-submit--primary"
+                onClick={onRecalculate}
+                disabled={isLoading}
+              >
+                <span>{isLoading ? 'Recalculando…' : 'Cotizar mi garantía'}</span>
+                {!isLoading ? <ArrowRightIcon /> : null}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
-
