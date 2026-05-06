@@ -6,9 +6,10 @@ import { Result } from '@/components/result';
 import Footer from '@/components/Footer';
 import { HomeMainLeftPanel, HomeMainRightPanel } from '@/components/home-main-panels';
 import { useHomeState } from '@/hooks/useHomeState';
+import { PARTNERS_MOCK_LIST } from '@/lib/partners-mock';
 
 export function HomeClient() {
-  const { isMounted, qualification, advisorEmail, partner, advisorEmailValidation, setAdvisorEmail, setQualification } = useHomeState();
+  const { isMounted, qualification, advisorEmail, partner, setAdvisorEmail, setQualification } = useHomeState();
 
   if (!isMounted) {
     return <div className="min-h-screen bg-[var(--app-lilac)]" />;
@@ -35,9 +36,9 @@ export function HomeClient() {
           <div className="grid grid-cols-1 gap-6 md:gap-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,555px)] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,560px)] xl:gap-7 2xl:grid-cols-[minmax(0,1fr)_minmax(0,620px)]">
             <HomeMainLeftPanel
               advisorEmail={advisorEmail}
+              partnerOptions={PARTNERS_MOCK_LIST}
               partnerLogoSrc={partner?.logo ?? null}
               isCeBrokersPartner={partner?.email?.toLowerCase().endsWith('@cebrokers.com') ?? false}
-              advisorEmailValidation={advisorEmailValidation}
               onAdvisorEmailChange={setAdvisorEmail}
             />
             <HomeMainRightPanel>

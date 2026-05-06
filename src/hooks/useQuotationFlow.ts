@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import {
-  PARTNERS_AGENTS,
   DOCUMENT_TYPES,
   EMPLOYMENT_STUDENT_ID,
   GENDERS,
@@ -12,6 +11,7 @@ import {
   ANTIQUITIES,
   TERMS,
 } from '@/lib/constants';
+import { isAllowedAdvisorEmailFromMock, resolvePartnerAgent } from '@/lib/partners-mock';
 import {
   alignQualificationStatusForPassport,
   getPassportAlignedStatusId,
@@ -31,7 +31,8 @@ import {
 import { QualificationStatusId } from '@/mocks/qualification-status-id.enum';
 import { buildMockQualificationIntermediate } from '@/mocks/qualification-intermediate-states';
 import { buildMockQualificationRejected } from '@/mocks/qualification-rejected';
-import { useAppDispatch } from '@/state/AppStateContext';
+import { useAppDispatch, useAppState } from '@/state/AppStateContext';
+import { selectAdvisorEmail } from '@/state/appState.selectors';
 
 /** Fijo en mock para URL de constancia / QR predecible (mismo criterio que `bail_number` real). */
 const MOCK_BAIL_NUMBER = 'MOCK-BAIL-PRUEBA';
@@ -45,6 +46,7 @@ function buildMockQualification(params: {
   agentEmail: string;
 }): Qualification {
   const { rent, expenses, term, discountCode, tenantEmail, agentEmail } = params;
+  const advisor = resolvePartnerAgent(agentEmail);
   const contractMonths = term * 12;
 
   const base = Math.max(0, rent + expenses);
@@ -149,9 +151,9 @@ function buildMockQualification(params: {
       front: {
         nombre: ((tenantEmail ?? '').trim().split('@')[0] ?? '').trim() || 'Mock',
         agente: {
-          nombre: agentEmail ?? '',
-          email: agentEmail ?? '',
-          telefono: '',
+          nombre: advisor.displayName || advisor.email || '',
+          email: advisor.email || '',
+          telefono: advisor.phone || '',
           foto: null,
         },
       },
@@ -212,6 +214,7 @@ function normalizeNullableNumber(value: number | null): number | null {
 
 export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
   const dispatch = useAppDispatch();
+  const advisorEmailFromStore = selectAdvisorEmail(useAppState());
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDocType, setSelectedDocType] = useState(1);
   const [discountValidation, setDiscountValidation] = useState<Awaited<ReturnType<typeof validateDiscountCode>>>({
@@ -241,12 +244,19 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         term: 2,
         discount_code: '',
       },
-      agent_email: PARTNERS_AGENTS[0]?.email ?? '',
-      send_agent_email_to_tenant: false
+      agent_email: '',
+      send_agent_email_to_tenant: false,
     },
   });
 
   const { watch, setValue, handleSubmit } = form;
+
+  useEffect(() => {
+    setValue('agent_email', advisorEmailFromStore ?? '', {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  }, [advisorEmailFromStore, setValue]);
   const discountCode = watch('quotation.discount_code');
   const selectedGenderId = watch('user_personal_data.gender_id');
 
@@ -281,8 +291,14 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
     }
 
     try {
+      const partnerAgent = resolvePartnerAgent(data.agent_email);
+      if (!partnerAgent.email.trim() || !isAllowedAdvisorEmailFromMock(partnerAgent.email)) {
+        toast.error('Seleccioná un asesor habilitado');
+        setIsLoading(false);
+        return;
+      }
+
       const { document_value, document_type_id, first_name, last_name } = data.user_personal_data;
-      const agent = PARTNERS_AGENTS.find((a) => a.email === data.agent_email);
 
       let qualification: Qualification;
 
@@ -345,7 +361,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         origin_id: 1,
         is_partner: true,
         origin_channel_id: 431,
-        agent_email: data.agent_email,
+        agent_email: partnerAgent.email,
         send_agent_email_to_tenant: data.send_agent_email_to_tenant,
       } as const;
 
@@ -369,7 +385,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         if (passportOutcome === QualificationStatusId.AlmostApproved) {
           qualification = buildMockQualificationIntermediate(QualificationStatusId.AlmostApproved, {
             tenantEmail: data.user_personal_data.email,
-            agentEmail: agent?.email ?? data.agent_email,
+            agentEmail: partnerAgent.email,
           });
         } else {
           qualification = buildMockQualification({
@@ -378,7 +394,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
             term: data.quotation.term,
             discountCode: data.quotation.discount_code || undefined,
             tenantEmail: data.user_personal_data.email,
-            agentEmail: agent?.email ?? data.agent_email,
+            agentEmail: partnerAgent.email,
           });
         }
         toast.success('Calificación procesada');
@@ -389,7 +405,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
       ) {
         qualification = buildMockQualificationRejected({
           tenantEmail: data.user_personal_data.email,
-          agentEmail: agent?.email ?? data.agent_email,
+          agentEmail: partnerAgent.email,
           variant: rejectedVariantFromMockMode(mockMode),
         });
         toast.info('Mock: solicitud no aprobada');
@@ -401,7 +417,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         } else {
           qualification = buildMockQualificationIntermediate(intermediateId, {
             tenantEmail: data.user_personal_data.email,
-            agentEmail: agent?.email ?? data.agent_email,
+            agentEmail: partnerAgent.email,
           });
           toast.info(`Mock: calificación estado ${intermediateId}`);
         }

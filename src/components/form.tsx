@@ -5,6 +5,8 @@ import { Controller } from 'react-hook-form';
 import { IMaskInput } from 'react-imask';
 import { useQuotationFlow } from '@/hooks/useQuotationFlow';
 import { EMPLOYMENT_STUDENT_ID } from '@/lib/constants';
+import { useAppState } from '@/state/AppStateContext';
+import { selectIsAuthenticated } from '@/state/appState.selectors';
 
 import type { Qualification } from '@/lib/quotation.api';
 
@@ -64,6 +66,7 @@ function DocTypeSelect({
 }
 
 export function Form({ onComplete }: FormProps) {
+  const isAuthenticated = selectIsAuthenticated(useAppState());
   const {
     register,
     control,
@@ -488,7 +491,7 @@ export function Form({ onComplete }: FormProps) {
         </fieldset>
 
         <div className="form-submit">
-          <button type="submit" disabled={isLoading || !isValid}>
+          <button type="submit" disabled={isLoading || !isValid || !isAuthenticated}>
             {isLoading ? 'Cargando...' : 'Cotizar'}
           </button>
         </div>

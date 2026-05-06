@@ -487,3 +487,37 @@
   }
 }
 
+/* Selector de asesor (columna izquierda home): flecha con margen y control más bajo */
+.home-advisor-select {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: min(100%, 22rem);
+  min-height: 2.375rem;
+  padding: 0.35rem 2.25rem 0.35rem 0.75rem;
+  border: 1px solid rgba(15, 0, 84, 0.12);
+  border-radius: 0.375rem;
+  background-color: var(--app-lilac-light);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--label-color);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%230f0054' stroke-opacity='0.75' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' d='M1.75 1.5 6 5.75 10.25 1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.875rem center;
+  background-size: 0.6875rem auto;
+}
+
+.home-advisor-select:focus-visible {
+  border-color: var(--primary);
+}
+
+.home-advisor-select:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}

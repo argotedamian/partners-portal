@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useNavbarState } from '@/hooks/useNavbarState';
@@ -32,27 +33,36 @@ export function Navbar() {
           <div className="navbar-auth-left">
             <Link href="/?reset=1" className="navbar-auth-brand" aria-label="Hoggax — inicio">
               <span className="navbar-auth-logos-row">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/hoggax-logo.svg"
-                  alt="Hoggax"
-                  className="navbar-auth-logo"
-                  width={160}
-                  height={41}
-                />
+                <span className="navbar-auth-logo-box navbar-auth-logo-box--hoggax">
+                  <Image
+                    src="/hoggax-logo.svg"
+                    alt="Hoggax"
+                    className="navbar-auth-logo-img"
+                    fill
+                    sizes="(max-width: 640px) 92px, 124px"
+                    unoptimized
+                    priority
+                  />
+                </span>
                 <span className="navbar-auth-sep" aria-hidden="true">
                   |
                 </span>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={partnerLogoSrc}
-                  alt="Logo del partner"
-                  className={`navbar-auth-partner-logo${
-                    partner?.email?.toLowerCase().endsWith('@cebrokers.com') ? ' navbar-auth-partner-logo--ce' : ''
+                <span
+                  className={`navbar-auth-logo-box navbar-auth-logo-box--partner${
+                    partner?.email?.toLowerCase().endsWith('@cebrokers.com') ? ' navbar-auth-logo-box--ce' : ''
+                  }${
+                    partner?.email?.toLowerCase().endsWith('@mob.com') ? ' navbar-auth-logo-box--mob' : ''
                   }`}
-                  width={122}
-                  height={29}
-                />
+                >
+                  <Image
+                    src={partnerLogoSrc}
+                    alt="Logo del partner"
+                    className="navbar-auth-logo-img"
+                    fill
+                    sizes="(max-width: 640px) 108px, 128px"
+                    unoptimized
+                  />
+                </span>
               </span>
             </Link>
           </div>

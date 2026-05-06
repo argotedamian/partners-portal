@@ -1,56 +1,22 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppDispatch, useAppState } from '@/state/AppStateContext';
 import {
-  selectAdvisorEmail,
   selectIsMounted,
   selectPartner,
   selectQualification,
+  selectAdvisorEmail,
 } from '@/state/appState.selectors';
 import type { Qualification } from '@/lib/quotation.api';
-import partnersMock from '../../public/mocks/partners.json';
-
-const MOCK_ADVISOR_EMAILS = new Set(
-  partnersMock
-    .map((partner) => partner.email?.trim().toLowerCase())
-    .filter((email): email is string => Boolean(email)),
-);
-
-type AdvisorEmailValidation =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'valid' }
-  | { status: 'invalid'; message: string };
-
-function isMockAdvisorEmail(value: string) {
-  const email = value.trim().toLowerCase();
-  if (!email) return false;
-
-  const hasValidEmailShape = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!hasValidEmailShape) return false;
-
-  return MOCK_ADVISOR_EMAILS.has(email);
-}
-
-function getMockPartnerByEmail(value: string) {
-  const email = value.trim().toLowerCase();
-  if (!email) return null;
-
-  return (
-    partnersMock.find((partner) => partner.email?.trim().toLowerCase() === email) ?? null
-  );
-}
+import { getPartnerFromMockByEmail } from '@/lib/partners-mock';
 
 export function useHomeState() {
   const state = useAppState();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const [advisorEmailValidation, setAdvisorEmailValidation] = useState<AdvisorEmailValidation>({ status: 'idle' });
-  const advisorEmailTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isMounted = selectIsMounted(state);
   const qualification = selectQualification(state);
@@ -69,32 +35,21 @@ export function useHomeState() {
   }, [dispatch, router, searchParams]);
 
   useEffect(() => {
-    if (advisorEmailTimer.current) clearTimeout(advisorEmailTimer.current);
-
     const email = advisorEmail.trim();
     if (!email) {
-      setAdvisorEmailValidation({ status: 'idle' });
       dispatch({ type: 'session/setAuthenticated', payload: false });
       dispatch({ type: 'session/setPartner', payload: null });
       return;
     }
 
-    setAdvisorEmailValidation({ status: 'loading' });
-    advisorEmailTimer.current = setTimeout(() => {
-      const isValid = isMockAdvisorEmail(email);
-      const partner = isValid ? getMockPartnerByEmail(email) : null;
-      dispatch({ type: 'session/setAuthenticated', payload: isValid });
-      dispatch({ type: 'session/setPartner', payload: partner });
-      setAdvisorEmailValidation(
-        isValid
-          ? { status: 'valid' }
-          : { status: 'invalid', message: 'El correo no es válido. Usá un email de asesor habilitado.' },
-      );
-    }, 650);
-
-    return () => {
-      if (advisorEmailTimer.current) clearTimeout(advisorEmailTimer.current);
-    };
+    const nextPartner = getPartnerFromMockByEmail(email);
+    if (nextPartner) {
+      dispatch({ type: 'session/setAuthenticated', payload: true });
+      dispatch({ type: 'session/setPartner', payload: nextPartner });
+    } else {
+      dispatch({ type: 'session/setAuthenticated', payload: false });
+      dispatch({ type: 'session/setPartner', payload: null });
+    }
   }, [advisorEmail, dispatch]);
 
   function setQualification(value: Qualification | null) {
@@ -110,9 +65,7 @@ export function useHomeState() {
     qualification,
     advisorEmail,
     partner,
-    advisorEmailValidation,
     setQualification,
     setAdvisorEmail,
   };
 }
-

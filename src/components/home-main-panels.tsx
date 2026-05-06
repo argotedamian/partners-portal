@@ -1,19 +1,24 @@
 'use client';
 
+import type { PartnerMockRow } from '@/lib/partners-mock';
+
 type HomeMainLeftPanelProps = {
   advisorEmail: string;
+  partnerOptions: PartnerMockRow[];
   partnerLogoSrc: string | null;
   isCeBrokersPartner: boolean;
-  advisorEmailValidation: { status: 'idle' | 'loading' | 'valid' } | { status: 'invalid'; message: string };
   onAdvisorEmailChange: (value: string) => void;
+  /** Si está definido y es `true`, el asesor queda fijado (p. ej. sesión ya resuelta). */
+  advisorSelectDisabled?: boolean;
 };
 
 export function HomeMainLeftPanel({
   advisorEmail,
+  partnerOptions,
   partnerLogoSrc,
   isCeBrokersPartner,
-  advisorEmailValidation,
   onAdvisorEmailChange,
+  advisorSelectDisabled = false,
 }: HomeMainLeftPanelProps) {
   return (
     <section className="flex h-full flex-col justify-between rounded-2xl bg-white p-2 sm:p-3 lg:p-0">
@@ -29,41 +34,26 @@ export function HomeMainLeftPanel({
             htmlFor="advisor-email"
             className="mb-2 block text-sm font-semibold leading-[117%] tracking-[0] text-label sm:text-base"
           >
-            Correo electrónico del asesor <span className="text-[var(--primary)]">*</span>
+            Asesor <span className="text-[var(--primary)]">*</span>
           </label>
-          <input
+          <select
             id="advisor-email"
-            type="email"
             value={advisorEmail}
+            disabled={advisorSelectDisabled}
             onChange={(event) => onAdvisorEmailChange(event.target.value)}
-            placeholder="tunombre@mail.com"
-            className="h-11 w-full rounded-md border border-[rgba(15,0,84,0.12)] bg-[var(--app-lilac-light)] px-4 text-sm font-semibold text-label outline-none placeholder:text-label/45 focus:border-[var(--primary)]"
-          />
-          {advisorEmailValidation.status === 'loading' && (
-            <div className="mt-2 flex items-center gap-2 text-sm font-semibold text-label/70">
-              <svg
-                className="h-4 w-4 animate-spin text-[var(--primary)]"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 0 1 8-8v2a6 6 0 0 0-6 6H4z"
-                />
-              </svg>
-              Validando email…
-            </div>
-          )}
-          {advisorEmailValidation.status === 'invalid' && (
-            <div className="mt-2 flex items-start gap-2 rounded-md border border-[rgba(226,0,78,0.35)] bg-[rgba(226,0,78,0.08)] px-3 py-2 text-sm font-semibold text-[var(--primary)]">
-              <span className="inline-flex h-5 w-5 flex-none items-center justify-center rounded-full border border-[var(--primary)]">
-                ×
-              </span>
-              <span>{advisorEmailValidation.message}</span>
-            </div>
+            className="home-advisor-select"
+          >
+            <option value="">Seleccioná un asesor</option>
+            {partnerOptions.map((p) => (
+              <option key={p.email} value={p.email}>
+                {p.fullname} ({p.email})
+              </option>
+            ))}
+          </select>
+          {!advisorEmail.trim() && (
+            <p className="mt-2 text-sm font-semibold text-label/60">
+              Elegí un asesor para habilitar la cotización.
+            </p>
           )}
         </div>
       </div>
@@ -77,30 +67,30 @@ export function HomeMainLeftPanel({
           width={487}
           height={345}
         />
-        <div className="flex items-center justify-center gap-0">
+        <div className="flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/hoggax-logo.svg"
             alt="Hoggax"
-            className="block h-auto max-w-[142px] object-contain sm:max-w-[160px]"
+            className="block h-[28px] w-auto object-contain sm:h-[34px]"
             width={160}
             height={41}
           />
           {partnerLogoSrc && (
             <>
-              <span className="mx-[10px] text-label/50 leading-none sm:mx-[14px]" aria-hidden="true">
+              <span
+                className="mx-3 text-label/50 leading-none sm:mx-4"
+                aria-hidden="true"
+              >
                 |
               </span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={partnerLogoSrc}
                 alt="Partner"
-                className="h-[28px] w-auto max-w-[150px] object-contain sm:h-[34px] sm:max-w-[175px]"
-                style={
-                  isCeBrokersPartner
-                    ? { transform: 'scale(1.18)', transformOrigin: 'left center' }
-                    : undefined
-                }
+                className={`block h-[28px] w-auto object-contain sm:h-[34px]${
+                  isCeBrokersPartner ? ' scale-[1.18] origin-left' : ''
+                }${partnerLogoSrc.toLowerCase().includes('mob') ? ' -translate-y-px' : ''}`}
                 width={175}
                 height={34}
               />

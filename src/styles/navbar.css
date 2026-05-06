@@ -90,25 +90,50 @@
 }
 
 /* Mobile-first: logos más compactos; escalan desde sm */
-.navbar-auth-logo {
-  height: 22px;
-  width: auto;
-  max-width: 92px;
+.navbar-auth-logo-box {
+  position: relative;
   display: block;
+  flex-shrink: 0;
+  height: 22px;
+}
+
+.navbar-auth-logo-box--hoggax {
+  width: 112px;
+}
+
+.navbar-auth-logo-box--partner {
+  width: 112px;
+}
+
+.navbar-auth-logo-img {
   object-fit: contain;
 }
 
 @media (min-width: 480px) {
-  .navbar-auth-logo {
+  .navbar-auth-logo-box {
     height: 26px;
-    max-width: 112px;
+  }
+
+  .navbar-auth-logo-box--hoggax {
+    width: 128px;
+  }
+
+  .navbar-auth-logo-box--partner {
+    width: 128px;
   }
 }
 
 @media (min-width: 640px) {
-  .navbar-auth-logo {
+  .navbar-auth-logo-box {
     height: 29px;
-    max-width: 124px;
+  }
+
+  .navbar-auth-logo-box--hoggax {
+    width: 140px;
+  }
+
+  .navbar-auth-logo-box--partner {
+    width: 140px;
   }
 }
 
@@ -125,38 +150,23 @@
   color: var(--label-color);
   opacity: 0.45;
   line-height: 1;
-  margin: 0 0.35rem;
+  margin: 0 0.12rem;
 }
 
-.navbar-auth-partner-logo {
-  height: 22px;
-  width: auto;
-  max-width: 108px;
-  display: block;
-  object-fit: contain;
-  margin-left: 0;
+/* Ajuste visual: CE Brokers tiene padding interno y se ve más chico. */
+.navbar-auth-logo-box--ce .navbar-auth-logo-img {
+  transform: scale(1.28);
+  transform-origin: center;
 }
 
-.navbar-auth-partner-logo--ce {
-  transform: scale(1.18);
-  transform-origin: left center;
-}
-
-@media (min-width: 480px) {
-  .navbar-auth-partner-logo {
-    height: 26px;
-    max-width: 120px;
-  }
+/* Ajuste visual: algunos logos (p.ej. MOB) vienen con padding interno y se ven “bajos”. */
+.navbar-auth-logo-box--mob .navbar-auth-logo-img {
+  transform: translateY(-1px);
 }
 
 @media (min-width: 640px) {
   .navbar-auth-sep {
-    margin: 0 0.45rem;
-  }
-
-  .navbar-auth-partner-logo {
-    height: 29px;
-    max-width: 128px;
+    margin: 0 0.16rem;
   }
 }
 
