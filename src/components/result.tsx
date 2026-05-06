@@ -2,64 +2,13 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { Qualification, QualificationPaymentMethod } from '@/lib/quotation.api';
+import type { Qualification } from '@/lib/quotation.api';
+import { formatArs } from '@/lib/format-currency';
 import { useAppState } from '@/state/AppStateContext';
 import { selectPartner, selectQualification } from '@/state/appState.selectors';
 import { QuotationEditPanel } from '@/components/quotation-edit-panel';
-import { QuoterPlanCard } from '@/components/quoter-plan-card';
-
-function coerceRecord(value: unknown): Record<string, unknown> {
-  return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-}
-
-function normalizePaymentMethod(raw: unknown, idx: number): QualificationPaymentMethod {
-  const item = coerceRecord(raw);
-  const subTexto = String(item.subTexto ?? item.sub_texto ?? '');
-  const infoTexto = String(item.infoTexto ?? item.info_texto ?? '');
-  const precioTexto = String(item.precioTexto ?? item.precio_texto ?? '');
-  const texto = String(item.texto ?? '');
-
-  return {
-    _id: String(item._id ?? `pm_${idx}`),
-    orden: Number(item.orden ?? idx),
-    cuotas: Number(item.cuotas ?? 0),
-    visible: item.visible !== false,
-    destacado: Boolean(item.destacado),
-    texto,
-    subTexto: subTexto || undefined,
-    precioTexto: precioTexto || undefined,
-    infoTexto: infoTexto || undefined,
-    importe: Number(item.importe ?? 0),
-    importeTotal: item.importeTotal != null ? Number(item.importeTotal) : undefined,
-    importeCuota: item.importeCuota != null ? Number(item.importeCuota) : undefined,
-    importeAdelanto: item.importeAdelanto != null ? Number(item.importeAdelanto) : undefined,
-  };
-}
-
-function paymentMethodsFromCotizacion(apiRes: Qualification['api_res_data']): QualificationPaymentMethod[] {
-  const cot = apiRes?.cotizacion;
-  if (!cot) return [];
-  const raw = cot.facilidadesPago ?? cot.facilita_desPago ?? [];
-  return raw.map((row, idx) => normalizePaymentMethod(row, idx));
-}
-
-function displayPlanAmount(method: QualificationPaymentMethod): number {
-  if (method.cuotas <= 1) {
-    return method.importeTotal ?? method.importe;
-  }
-  return method.importeCuota ?? method.importe;
-}
-
-function normalizePhoneDisplay(value: string | undefined | null): string {
-  const digits = String(value ?? '').replace(/\D/g, '');
-  if (!digits) return '';
-  const trimmed = digits.length > 10 ? digits.slice(-10) : digits;
-  return trimmed.length === 8
-    ? `${trimmed.slice(0, 4)}-${trimmed.slice(4)}`
-    : trimmed.length === 10
-      ? `${trimmed.slice(0, 4)}-${trimmed.slice(4, 8)}-${trimmed.slice(8)}`
-      : trimmed;
-}
+import { PartnersQuotationApproved } from '@/components/partners-result/partners-quotation-approved';
+import { displayPlanAmount, paymentMethodsFromCotizacion } from '@/components/result-payment-methods';
 
 interface ResultProps {
   qualification?: Qualification;
@@ -87,11 +36,6 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
   const quoteValue = qualification?.api_res_data?.cotizacion?.costoServicio;
   const paymentMethods = paymentMethodsFromCotizacion(qualification.api_res_data).filter((p) => p.visible);
   const agent = qualification?.api_res_data?.front?.agente;
-
-  const formatArs = (value: number | undefined | null): string => {
-    if (value == null || isNaN(Number(value))) return '-';
-    return `$${Number(value).toLocaleString('es-AR')}`;
-  };
 
   const copyWhatsAppSummary = () => {
     const cot = qualification?.api_res_data?.cotizacion;
@@ -170,92 +114,12 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
   // Approved (status_id: 4)
   if (statusId === 4) {
     if (isPartners && qualification.is_quotation_only) {
-      const cot = qualification?.api_res_data?.cotizacion;
-      const alquiler = cot?.alquiler ?? null;
-      const expensas = cot?.expensas ?? null;
-      const duracionAnios = cot?.plazo ?? 2;
-      const priceFinal = quoteValue;
-      const commissionPercent = partner?.comision ?? null;
-
       return (
-        <div className="partners-result-approved overflow-x-hidden">
-          <section className="partners-result-top py-5 sm:py-7">
-            <div className="max-w-6xl mx-auto px-4">
-              <div className="partners-result-editbar">
-                <QuotationEditPanel />
-              </div>
-
-              <div className="partners-result-hero text-center pt-3">
-                <h2 className="partners-result-title text-[var(--app-green)] font-extrabold text-[32px] leading-[1.05] sm:text-[44px]">
-                  Tu cotización está aprobada.
-                </h2>
-                <p className="partners-result-subtitle font-bold text-label mt-3 text-[18px] sm:text-[22px]">
-                  Conocé las opciones de pago
-                </p>
-
-                <div className="partners-result-price mt-4 sm:mt-5 flex flex-col items-center gap-1">
-                  <span className="partners-result-price-label text-[12px] font-extrabold text-label/60">
-                    Precio final
-                  </span>
-                  <div className="partners-result-price-pill min-w-[170px] rounded-lg bg-[#1b1b44] px-4 py-2 text-[22px] font-extrabold text-white">
-                    {formatArs(priceFinal)}
-                  </div>
-                </div>
-
-                {paymentMethods.length > 0 && (
-                  <div className="mt-5" aria-label="Opciones de pago">
-                    <div className="partners-result-cards mx-auto grid w-full max-w-[1100px] grid-cols-1 justify-center gap-4 sm:grid-cols-2 md:gap-5 xl:grid-cols-[300px_230px_230px_230px] xl:gap-4">
-                      {paymentMethods.slice(0, 4).map((method) => (
-                        <QuoterPlanCard
-                          key={method._id}
-                          plan={method}
-                          offPercent={method.destacado ? (qualification?.api_res_data?.cotizacion?.discount ?? 0) : 0}
-                          quotationImporte={qualification?.api_res_data?.cotizacion?.costoServicioRaw ?? null}
-                          isSelected={Boolean(method.destacado)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <p className="partners-result-fineprint mx-auto mt-4 max-w-[880px] text-[12px] font-bold text-label/45">
-                  Correspondiente a un alquiler mensual de {formatArs(alquiler)} y expensas de {formatArs(expensas)}.
-                  Valor final con IVA incluido por un contrato de {duracionAnios * 12} meses.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="partners-result-band bg-gradient-to-r from-[#0c0b4d] to-[#15156a] py-5" aria-label="Comisión">
-            <div className="max-w-6xl mx-auto px-4">
-              <div className="partners-result-band-inner flex min-h-[52px] items-center justify-center">
-                <span className="partners-result-band-text text-[18px] font-extrabold text-white">
-                  Tu comisión es de {commissionPercent != null ? `${commissionPercent}%` : '%'}
-                </span>
-              </div>
-            </div>
-          </section>
-
-          <section className="partners-result-certificate bg-white py-8 sm:py-10" aria-label="Certificado">
-            <div className="max-w-6xl mx-auto px-4">
-              <h3 className="partners-result-certificate-title text-center text-[18px] font-extrabold text-label">
-                Descargá el certificado de aprobación
-              </h3>
-
-              <div className="partners-result-qr-card mx-auto mt-5 grid max-w-[380px] place-items-center gap-4 rounded-2xl border border-[rgba(15,0,84,0.08)] bg-[rgba(239,240,255,0.7)] p-5">
-                <div className="partners-result-qr h-[170px] w-[170px] rounded-lg bg-[repeating-linear-gradient(45deg,rgba(15,0,84,0.1),rgba(15,0,84,0.1)_8px,rgba(15,0,84,0.05)_8px,rgba(15,0,84,0.05)_16px)]" aria-hidden="true" />
-                <div className="partners-result-qr-actions grid w-full gap-3">
-                  <button type="button" className="partners-result-qr-download w-full rounded-lg bg-[#55c4a9] px-4 py-2 text-[15px] font-extrabold text-white" disabled>
-                    Descargar
-                  </button>
-                  <button type="button" className="partners-result-qr-share w-full rounded-lg border border-[rgba(15,0,84,0.12)] bg-white px-4 py-2 text-[15px] font-extrabold text-label/85" disabled>
-                    Compartir
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
+        <PartnersQuotationApproved
+          qualification={qualification}
+          paymentMethods={paymentMethods}
+          commissionPercent={partner?.comision ?? null}
+        />
       );
     }
 
