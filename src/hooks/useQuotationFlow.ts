@@ -17,6 +17,14 @@ import {
   validateDiscountCode,
 } from '@/lib/quotation.api';
 import type { Qualification } from '@/lib/quotation.api';
+import {
+  intermediateStatusIdFromMockMode,
+  parseQualificationMockMode,
+  QualificationMockMode,
+  rejectedVariantFromMockMode,
+} from '@/mocks/qualification-mock-mode.enum';
+import { QualificationStatusId } from '@/mocks/qualification-status-id.enum';
+import { buildMockQualificationIntermediate } from '@/mocks/qualification-intermediate-states';
 import { buildMockQualificationRejected } from '@/mocks/qualification-rejected';
 import { useAppDispatch } from '@/state/AppStateContext';
 
@@ -125,7 +133,7 @@ function buildMockQualification(params: {
   ];
 
   return {
-    status_id: 4,
+    status_id: QualificationStatusId.ApprovedQuotation,
     is_quotation_only: true,
     id: now,
     bail_number: MOCK_BAIL_NUMBER,
@@ -339,8 +347,12 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
 
       dispatch({ type: 'quotation/setDraft', payload: { qualificationRequest } });
 
-      const mockMode = process.env.NEXT_PUBLIC_USE_MOCK_RESULT;
-      if (mockMode === '1') {
+      const mockMode = parseQualificationMockMode(process.env.NEXT_PUBLIC_USE_MOCK_RESULT);
+
+      if (mockMode === null) {
+        qualification = await createQualification(qualificationRequest);
+        toast.success('Calificación procesada');
+      } else if (mockMode === QualificationMockMode.ApprovedQuotation) {
         qualification = buildMockQualification({
           rent: data.quotation.rent,
           expenses: data.quotation.expenses,
@@ -350,18 +362,32 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
           agentEmail: agent?.email ?? data.agent_email,
         });
         toast.success('Calificación procesada');
-      } else if (mockMode === 'rejected') {
+      } else if (
+        mockMode === QualificationMockMode.Rejected ||
+        mockMode === QualificationMockMode.RejectedStatus7 ||
+        mockMode === QualificationMockMode.RejectedStatus8
+      ) {
         qualification = buildMockQualificationRejected({
           tenantEmail: data.user_personal_data.email,
           agentEmail: agent?.email ?? data.agent_email,
+          variant: rejectedVariantFromMockMode(mockMode),
         });
         toast.info('Mock: solicitud no aprobada');
       } else {
-        qualification = await createQualification(qualificationRequest);
-        toast.success('Calificación procesada');
+        const intermediateId = intermediateStatusIdFromMockMode(mockMode);
+        if (intermediateId === null) {
+          qualification = await createQualification(qualificationRequest);
+          toast.success('Calificación procesada');
+        } else {
+          qualification = buildMockQualificationIntermediate(intermediateId, {
+            tenantEmail: data.user_personal_data.email,
+            agentEmail: agent?.email ?? data.agent_email,
+          });
+          toast.info(`Mock: calificación estado ${intermediateId}`);
+        }
       }
 
-      if ([4, 5].includes(qualification.status_id)) {
+      if ([QualificationStatusId.ApprovedQuotation, 5].includes(qualification.status_id)) {
         void notifyFianzaAprobacionWebhook(qualification);
       }
 
