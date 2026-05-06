@@ -1,0 +1,272 @@
+/* ============================================
+   PARTNERS RESULT (approved quotation only)
+   ============================================ */
+
+.partners-result-approved {
+  background: white;
+}
+
+.partners-result-top {
+  padding: 1.25rem 0 1.5rem;
+}
+
+.partners-result-editbar {
+  margin-bottom: 0.85rem;
+}
+
+.partners-result-editbar--full {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.partners-result-hero {
+  text-align: center;
+  padding: 0.75rem 0 0;
+}
+
+.partners-result-title {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  font-weight: 900;
+  color: var(--app-green);
+}
+
+.partners-result-subtitle {
+  margin: 0.65rem 0 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--label-color);
+}
+
+.partners-result-price {
+  margin: 0.9rem auto 1.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.partners-result-price-label {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.partners-result-price-pill {
+  min-width: 170px;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  background: #1b1b44;
+  color: white;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.partners-result-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin: 0.9rem auto 0.6rem;
+  max-width: 980px;
+}
+
+.partners-result-card {
+  background: rgba(239, 240, 255, 0.75);
+  border: 1px solid rgba(15, 0, 84, 0.08);
+  border-radius: 1rem;
+  padding: 0.85rem 0.95rem;
+  text-align: left;
+}
+
+.partners-result-card.is-featured {
+  background: var(--primary);
+  border-color: rgba(255, 54, 108, 0.5);
+  color: white;
+}
+
+.partners-result-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.partners-result-card-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.partners-result-card-price-value {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--primary);
+}
+
+.partners-result-card.is-featured .partners-result-card-price-value {
+  color: white;
+}
+
+.partners-result-card-price-sub {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: rgba(15, 0, 84, 0.6);
+}
+
+.partners-result-card.is-featured .partners-result-card-price-sub {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.partners-result-card-body {
+  margin-top: 0.75rem;
+}
+
+.partners-result-card-title {
+  margin: 0 0 0.35rem;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--label-color);
+}
+
+.partners-result-card.is-featured .partners-result-card-title {
+  color: white;
+}
+
+.partners-result-card-muted {
+  margin: 0.1rem 0 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgba(15, 0, 84, 0.55);
+}
+
+.partners-result-card.is-featured .partners-result-card-muted {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.partners-result-fineprint {
+  margin: 0.85rem auto 0;
+  max-width: 880px;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(15, 0, 84, 0.45);
+}
+
+.partners-result-band {
+  background: linear-gradient(90deg, #0c0b4d, #15156a);
+  padding: 1.2rem 0;
+}
+
+.partners-result-band-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+}
+
+.partners-result-band-text {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: white;
+}
+
+.partners-result-certificate {
+  padding: 2rem 0 2.25rem;
+  background: white;
+}
+
+.partners-result-certificate-title {
+  margin: 0 0 1.15rem;
+  text-align: center;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--label-color);
+}
+
+.partners-result-qr-card {
+  margin: 0 auto;
+  max-width: 380px;
+  display: grid;
+  place-items: center;
+  gap: 0.9rem;
+  padding: 1.15rem;
+  border-radius: 1.25rem;
+  background: rgba(239, 240, 255, 0.7);
+  border: 1px solid rgba(15, 0, 84, 0.08);
+}
+
+.partners-result-qr {
+  width: 170px;
+  height: 170px;
+  border-radius: 0.5rem;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(15, 0, 84, 0.1),
+    rgba(15, 0, 84, 0.1) 8px,
+    rgba(15, 0, 84, 0.05) 8px,
+    rgba(15, 0, 84, 0.05) 16px
+  );
+}
+
+.partners-result-qr-actions {
+  width: 100%;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.partners-result-qr-download {
+  width: 100%;
+  padding: 0.6rem 0.95rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #55c4a9;
+  color: white;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.partners-result-qr-share {
+  width: 100%;
+  padding: 0.6rem 0.95rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: #ffffff;
+  color: #0f0054;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+@media (min-width: 768px) {
+  .partners-result-title {
+    font-size: 2.6rem;
+  }
+
+  .partners-result-subtitle {
+    font-size: 1.35rem;
+  }
+
+  .partners-result-cards {
+    grid-template-columns: 1.25fr 1fr 1fr 1fr;
+    align-items: stretch;
+  }
+
+  .partners-result-card.is-featured {
+    grid-row: span 1;
+    min-height: 220px;
+  }
+}

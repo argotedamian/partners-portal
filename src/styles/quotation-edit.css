@@ -1,0 +1,311 @@
+/* ============================================
+   EDITAR COTIZACIÓN (barra + panel expandible)
+   ============================================ */
+
+.quotation-edit-host {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Transición abrir/cerrar editor (View Transitions API; Chrome / Edge / Safari 18+) */
+@supports (view-transition-name: none) {
+  .quotation-edit-host {
+    view-transition-name: quotation-edit-panel;
+  }
+}
+
+::view-transition-old(quotation-edit-panel),
+::view-transition-new(quotation-edit-panel) {
+  animation-duration: 0.42s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+::view-transition-old(quotation-edit-panel) {
+  animation-name: quotation-edit-vt-fade-slide-out;
+}
+
+::view-transition-new(quotation-edit-panel) {
+  animation-name: quotation-edit-vt-fade-slide-in;
+}
+
+@keyframes quotation-edit-vt-fade-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes quotation-edit-vt-fade-slide-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(quotation-edit-panel),
+  ::view-transition-new(quotation-edit-panel) {
+    animation-duration: 0.01ms !important;
+    animation-name: none !important;
+  }
+}
+
+.quotation-edit-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: #f9fbff;
+  border: 1px solid rgba(15, 0, 84, 0.10);
+  border-radius: 0.85rem;
+  padding: 0.7rem 0.9rem 0.7rem 1rem;
+}
+
+.quotation-edit-items {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.quotation-edit-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.quotation-edit-label {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(15, 0, 84, 0.70);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quotation-edit-value {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.quotation-edit-sep {
+  display: none;
+}
+
+.quotation-edit-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 54, 108, 0.20);
+  background: rgba(255, 54, 108, 0.08);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.quotation-edit-button:hover {
+  background: rgba(255, 54, 108, 0.12);
+  border-color: rgba(255, 54, 108, 0.28);
+  transform: translateY(-1px);
+}
+
+.quotation-edit-button:active {
+  transform: translateY(0);
+}
+
+.quotation-edit-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 54, 108, 0.12);
+}
+
+/* Panel expandido: reemplaza la barra (no se muestran ambos a la vez) */
+.quotation-edit-expanded-shell {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 0, 84, 0.08);
+  background: linear-gradient(180deg, #eef3fe 0%, #f3f5ff 55%, #eef3fe 100%);
+  box-shadow: 0 4px 24px rgba(15, 0, 84, 0.06);
+  /* Aire respecto al borde lavanda + contenido interno */
+  padding: 1.35rem 1rem 1.65rem;
+}
+
+/* Navegadores sin View Transitions: entrada suave al abrir */
+@supports not (view-transition-name: none) {
+  .quotation-edit-expanded-shell {
+    animation: quotation-edit-fallback-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes quotation-edit-fallback-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quotation-edit-expanded-shell {
+    animation: none !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .quotation-edit-expanded-shell {
+    padding: 1.5rem 1.35rem 1.85rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .quotation-edit-expanded-shell {
+    padding: 1.65rem 1.75rem 2rem;
+  }
+}
+
+.quotation-edit-expanded-head {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 2rem;
+  margin-bottom: 0.35rem;
+}
+
+.quotation-edit-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin: 0 -0.35rem 0 0;
+  border: none;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: rgba(15, 0, 84, 0.38);
+  font-size: 1.65rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.quotation-edit-close:hover:not(:disabled) {
+  color: rgba(15, 0, 84, 0.65);
+  background: rgba(15, 0, 84, 0.05);
+}
+
+.quotation-edit-close:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Misma base que el formulario principal (form.tsx): .form-container + .price-field + .phone-grid */
+.quotation-edit-expanded-shell .form-container.quotation-edit-expanded-form {
+  margin-top: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Leyendas un poco más proporcionadas en el panel (el principal usa 2rem fijo) */
+.quotation-edit-expanded-form .form-section-title {
+  font-size: clamp(1.2rem, 2.8vw, 1.65rem);
+  margin-bottom: 0.55rem !important;
+}
+
+.quotation-edit-edit-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 0.25rem;
+  align-items: stretch;
+}
+
+.quotation-edit-coupon-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.quotation-edit-submit--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.62rem 1.15rem;
+  border-radius: 0.6rem;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.quotation-edit-submit--primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.quotation-edit-submit--primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (min-width: 640px) {
+  .quotation-edit-edit-actions {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
+  }
+
+  .quotation-edit-coupon-field {
+    max-width: min(100%, 340px);
+  }
+
+  .quotation-edit-submit--primary {
+    width: auto;
+    min-width: 220px;
+  }
+
+  .quotation-edit-items {
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .quotation-edit-item {
+    justify-content: flex-start;
+    gap: 0.4rem;
+  }
+
+  .quotation-edit-sep {
+    display: block;
+    width: 1px;
+    height: 28px;
+    background: rgba(15, 0, 84, 0.10);
+  }
+}

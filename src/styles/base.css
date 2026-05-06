@@ -1,0 +1,36 @@
+:root {
+  /* Colores Hoggax */
+  --primary: #FF366C;
+  --primary-hover: #E62E5C;
+  --app-lilac: #EFF0FF;
+  --app-lilac-light: #EEF3FF;
+  --app-lilac-dark: #DADBEB;
+  --app-green: #28a745;
+  --app-purple: #6c5ce7;
+  /* Texto UI principal (marca) */
+  --app-secondary: #0f0054;
+  --app-danger: #dc3545;
+  --label-color: #0f0054;
+}
+
+@theme inline {
+  --font-sans: "Nunito Sans", "Calibri", ui-sans-serif, system-ui, sans-serif;
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-app-lilac: var(--app-lilac);
+  --color-app-lilac-light: var(--app-lilac-light);
+  --color-app-green: var(--app-green);
+  --color-app-purple: var(--app-purple);
+  --color-label: var(--label-color);
+}
+
+html {
+  font-family: "Nunito Sans", "Calibri", ui-sans-serif, system-ui, sans-serif;
+  color: var(--label-color);
+}
+
+body {
+  background: #ffffff;
+  color: var(--label-color);
+  font-family: inherit;
+}

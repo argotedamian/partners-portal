@@ -1,0 +1,187 @@
+/* ============================================
+   Quoter plan card (React port from web)
+   ============================================ */
+
+.pp-quoter-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: #EEF3FE;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  height: 100%;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  cursor: default;
+  overflow: visible;
+}
+
+.pp-quoter-plan:hover:not(.is-selected) {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 2px solid var(--primary);
+}
+
+.pp-quoter-plan.is-selected {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 8px 24px rgba(233, 30, 99, 0.3);
+  transform: scale(1.03);
+  z-index: 2;
+}
+
+.pp-quoter-plan.is-featured .pp-quoter-plan-badge {
+  display: flex;
+}
+
+.pp-quoter-plan-badge {
+  display: none;
+  align-self: flex-start;
+  background-color: var(--primary);
+  color: white;
+  padding: 0.4rem 1.25rem;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+
+.pp-quoter-plan.is-featured.is-selected .pp-quoter-plan-badge {
+  background-color: #ff7298;
+}
+
+.pp-quoter-plan-price {
+  text-align: left;
+  margin-top: 0.5rem;
+}
+
+.pp-quoter-plan-price-original {
+  font-size: 14px;
+  color: #837F9B;
+  margin-bottom: 0.25rem;
+  min-height: 1.2em;
+}
+
+.pp-quoter-plan-price-original-line {
+  text-decoration: line-through;
+}
+
+.pp-quoter-plan-price-main {
+  line-height: 1;
+  display: inline-flex;
+  align-items: baseline;
+  color: var(--primary);
+  min-width: 0;
+  gap: 0.35rem;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-weight: 800;
+}
+
+.pp-quoter-plan-price-main-currency {
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.pp-quoter-plan-price-main-value {
+  font-size: clamp(2.25rem, 3vw, 2.75rem);
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pp-quoter-plan-price-main-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.pp-quoter-plan-divider {
+  border-top: 2px solid var(--primary);
+  margin: 1.25rem 0;
+  width: 100%;
+}
+
+.pp-quoter-plan-info {
+  text-align: left;
+  margin-bottom: 1rem;
+  min-height: 7.25rem;
+}
+
+.pp-quoter-plan-title {
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0;
+  text-transform: none;
+  color: #0f0054;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.4em;
+}
+
+.pp-quoter-plan-final {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 14px;
+  color: #837F9B;
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+.pp-quoter-plan-cft {
+  color: #837F9B;
+  font-family: 'Nunito Sans', sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+}
+
+.pp-quoter-plan-payment {
+  font-size: 18px;
+  color: var(--primary);
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  margin-top: auto;
+}
+
+.pp-quoter-plan.is-selected .pp-quoter-plan-price-original {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.pp-quoter-plan.is-selected .pp-quoter-plan-price-main,
+.pp-quoter-plan.is-selected .pp-quoter-plan-price-main-currency,
+.pp-quoter-plan.is-selected .pp-quoter-plan-price-main-value,
+.pp-quoter-plan.is-selected .pp-quoter-plan-price-main-label,
+.pp-quoter-plan.is-selected .pp-quoter-plan-title,
+.pp-quoter-plan.is-selected .pp-quoter-plan-final,
+.pp-quoter-plan.is-selected .pp-quoter-plan-final span,
+.pp-quoter-plan.is-selected .pp-quoter-plan-payment,
+.pp-quoter-plan.is-selected .pp-quoter-plan-cft {
+  color: white !important;
+}
+
+.pp-quoter-plan.is-selected .pp-quoter-plan-divider {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 767px) {
+  .pp-quoter-plan {
+    padding: 1.25rem;
+  }
+
+  .pp-quoter-plan.is-selected {
+    transform: none;
+  }
+
+  .pp-quoter-plan-price-main-value {
+    font-size: 2.25rem;
+  }
+}
