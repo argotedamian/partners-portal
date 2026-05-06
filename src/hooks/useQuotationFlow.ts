@@ -19,6 +19,9 @@ import {
 import type { Qualification } from '@/lib/quotation.api';
 import { useAppDispatch } from '@/state/AppStateContext';
 
+/** Fijo en mock para URL de constancia / QR predecible (mismo criterio que `bail_number` real). */
+const MOCK_BAIL_NUMBER = 'MOCK-BAIL-PRUEBA';
+
 function buildMockQualification(params: {
   rent: number;
   expenses: number;
@@ -124,7 +127,7 @@ function buildMockQualification(params: {
     status_id: 4,
     is_quotation_only: true,
     id: now,
-    bail_number: `MOCK-${now}`,
+    bail_number: MOCK_BAIL_NUMBER,
     pipedrive_id: now,
     quotation_id: now,
     api_res_data: {

@@ -1,6 +1,15 @@
 'use client';
 
-export function PartnersCertificatePlaceholder() {
+import QRCode from 'react-qr-code';
+
+type PartnersCertificatePlaceholderProps = {
+  /** URL o texto a codificar en el QR (típicamente link público al certificado). */
+  qrValue: string;
+};
+
+export function PartnersCertificatePlaceholder({ qrValue }: PartnersCertificatePlaceholderProps) {
+  const value = qrValue.trim() || 'https://www.hoggax.com';
+
   return (
     <section className="partners-result-certificate bg-white py-8 sm:py-10" aria-label="Certificado">
       <div className="max-w-6xl mx-auto px-4">
@@ -10,9 +19,12 @@ export function PartnersCertificatePlaceholder() {
 
         <div className="partners-result-qr-card mx-auto mt-5 grid max-w-[380px] place-items-center gap-4 rounded-2xl border border-[rgba(15,0,84,0.08)] bg-[rgba(239,240,255,0.7)] p-5">
           <div
-            className="partners-result-qr h-[170px] w-[170px] rounded-lg bg-[repeating-linear-gradient(45deg,rgba(15,0,84,0.1),rgba(15,0,84,0.1)_8px,rgba(15,0,84,0.05)_8px,rgba(15,0,84,0.05)_16px)]"
-            aria-hidden="true"
-          />
+            className="partners-result-qr flex h-[170px] w-[170px] items-center justify-center rounded-lg bg-white p-2 shadow-[inset_0_0_0_1px_rgba(15,0,84,0.06)]"
+            role="img"
+            aria-label="Código QR para acceder al certificado de aprobación"
+          >
+            <QRCode value={value} size={154} level="M" className="max-h-full max-w-full" />
+          </div>
           <div className="partners-result-qr-actions grid w-full gap-3">
             <button
               type="button"

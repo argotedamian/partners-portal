@@ -6,6 +6,7 @@ import { QuotationEditPanel } from '@/components/quotation-edit-panel';
 import { QuoterPlanCard } from '@/components/quoter-plan-card';
 import { PartnersCommissionBanner } from '@/components/partners-result/partners-commission-banner';
 import { PartnersCertificatePlaceholder } from '@/components/partners-result/partners-certificate-placeholder';
+import { buildPartnersCertificateQrValue } from '@/lib/partners-certificate-qr';
 
 type PartnersQuotationApprovedProps = {
   qualification: Qualification;
@@ -77,7 +78,7 @@ export function PartnersQuotationApproved({
         importeConIva={priceFinal ?? cot?.costoServicioRaw ?? null}
         commissionPercent={commissionPercent}
       />
-      <PartnersCertificatePlaceholder />
+      <PartnersCertificatePlaceholder qrValue={buildPartnersCertificateQrValue(qualification)} />
     </div>
   );
 }
