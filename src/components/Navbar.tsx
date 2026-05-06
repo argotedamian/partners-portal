@@ -1,10 +1,16 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useNavbarState } from '@/hooks/useNavbarState';
 
 export function Navbar() {
+  const pathname = usePathname();
   const { isAuthenticated, advisorLabel, partnerLogoSrc, partner } = useNavbarState();
+
+  if (pathname?.startsWith('/compartir-certificado')) {
+    return null;
+  }
 
   if (!isAuthenticated) {
     return (
