@@ -10,8 +10,8 @@ type PartnersQualificationDocumentationPendingProps = {
 export function PartnersQualificationDocumentationPending({
   qualification,
 }: PartnersQualificationDocumentationPendingProps) {
-  const agent = qualification?.api_res_data?.front?.agente;
-  const agentEmail = agent?.email?.trim() ?? '';
+  const agentEmail =
+    qualification?.api_res_data?.front?.agente?.email?.trim() ?? '';
 
   function handleSendToAdvisor() {
     if (!agentEmail) {
@@ -74,17 +74,6 @@ export function PartnersQualificationDocumentationPending({
             >
               Enviar a un asesor
             </button>
-            <p className="partners-doc-pending-footnote mt-5 text-sm font-semibold leading-relaxed text-[rgba(15,0,84,0.55)]">
-              {agent?.nombre ? (
-                <>
-                  <strong className="font-extrabold text-[var(--label-color)]">{agent.nombre}</strong>
-                  {' te va a contactar para asesorarte. '}
-                </>
-              ) : (
-                <>Un asesor te va a contactar para asesorarte. </>
-              )}
-              Vas a recibir un email con instrucciones; si no lo ves, revisá correo no deseado.
-            </p>
           </div>
         </div>
       </section>
