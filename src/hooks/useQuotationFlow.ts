@@ -145,7 +145,7 @@ function buildMockQualification(params: {
         alquiler: rent,
         expensas: expenses,
         plazo: term,
-        costoServicio: transferPrecioOriginal,
+        costoServicio: hasDiscount ? transferPrecioFinal : transferPrecioOriginal,
         costoServicioRaw: transferPrecioOriginal,
         legales: `Mock — contrato ${contractMonths} meses`,
         facilidadesPago: mockPaymentMethods,

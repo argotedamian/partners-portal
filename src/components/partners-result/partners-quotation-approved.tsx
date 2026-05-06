@@ -8,6 +8,34 @@ import { PartnersCommissionBanner } from '@/components/partners-result/partners-
 import { PartnersCertificatePlaceholder } from '@/components/partners-result/partners-certificate-placeholder';
 import { buildPartnersCertificateQrValue } from '@/lib/partners-certificate-qr';
 
+type CotizacionLike = NonNullable<Qualification['api_res_data']>['cotizacion'];
+
+function computePartnersDiscountPercent(cot: CotizacionLike | undefined): number {
+  if (!cot) return 0;
+  const fromApi = Number(cot.discount ?? 0);
+  if (Number.isFinite(fromApi) && fromApi > 0) return Math.round(fromApi);
+  const raw = cot.costoServicioRaw;
+  const final = cot.costoServicio;
+  if (raw != null && final != null && raw > 0 && raw > final) {
+    return Math.round((1 - final / raw) * 100);
+  }
+  return 0;
+}
+
+/** Importe sin cupón (tachado): preferimos API; si solo hay % y final, estimamos el bruto. */
+function resolveSinDescuentoImporte(
+  priceRaw: number | null,
+  priceFinal: number | null | undefined,
+  discountPct: number,
+): number | null {
+  if (priceFinal == null || !Number.isFinite(priceFinal)) return null;
+  if (priceRaw != null && priceRaw > priceFinal) return priceRaw;
+  if (discountPct > 0 && discountPct < 100) {
+    return Math.round(priceFinal / (1 - discountPct / 100));
+  }
+  return null;
+}
+
 type PartnersQuotationApprovedProps = {
   qualification: Qualification;
   paymentMethods: QualificationPaymentMethod[];
@@ -24,6 +52,11 @@ export function PartnersQuotationApproved({
   const expensas = cot?.expensas ?? null;
   const duracionAnios = cot?.plazo ?? 2;
   const priceFinal = cot?.costoServicio;
+  const priceRaw = cot?.costoServicioRaw ?? null;
+  const discountPct = computePartnersDiscountPercent(cot);
+  const showCouponPriceVariant =
+    discountPct > 0 && priceFinal != null && Number.isFinite(priceFinal);
+  const sinDescuentoImporte = resolveSinDescuentoImporte(priceRaw, priceFinal, discountPct);
 
   return (
     <div className="partners-result-approved overflow-x-hidden">
@@ -41,14 +74,36 @@ export function PartnersQuotationApproved({
               Conocé las opciones de pago
             </p>
 
-            <div className="partners-result-price mt-4 sm:mt-5 flex flex-col items-center gap-1">
-              <span className="partners-result-price-label text-[12px] font-extrabold text-label/60">
-                Precio final
-              </span>
-              <div className="partners-result-price-pill min-w-[170px] rounded-lg bg-[#1b1b44] px-4 py-2 text-[22px] font-extrabold text-white">
-                {formatArs(priceFinal)}
+            {showCouponPriceVariant ? (
+              <div className="partners-result-price partners-result-price--coupon mx-auto mt-4 flex max-w-[320px] flex-col items-center sm:mt-5">
+                <span className="text-center font-extrabold leading-snug text-[15px] text-[var(--primary)] sm:text-[17px]">
+                  Precio final con cupón
+                </span>
+                <div className="relative mt-7 w-full">
+                  <div className="absolute left-1/2 top-0 z-[2] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-[var(--primary)] px-3.5 py-1.5 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-[0_2px_10px_rgba(255,54,108,0.35)] sm:text-[12px]">
+                    {discountPct}% OFF
+                  </div>
+                  <div className="partners-result-price-pill flex min-h-[56px] w-full min-w-[170px] items-center justify-center rounded-lg bg-[#1b1b44] px-5 text-[22px] font-extrabold text-white">
+                    {formatArs(priceFinal)}
+                  </div>
+                </div>
+                {sinDescuentoImporte != null ? (
+                  <p className="mt-3 text-center text-[13px] font-semibold text-[#837F9B]">
+                    <span>Sin descuento </span>
+                    <span className="line-through decoration-[#837F9B]">{formatArs(sinDescuentoImporte)}</span>
+                  </p>
+                ) : null}
               </div>
-            </div>
+            ) : (
+              <div className="partners-result-price mt-4 sm:mt-5 flex flex-col items-center gap-1">
+                <span className="partners-result-price-label text-[12px] font-extrabold text-[var(--primary)]">
+                  Precio final
+                </span>
+                <div className="partners-result-price-pill min-w-[170px] rounded-lg bg-[#1b1b44] px-4 py-2 text-[22px] font-extrabold text-white">
+                  {formatArs(priceFinal)}
+                </div>
+              </div>
+            )}
 
             {paymentMethods.length > 0 && (
               <div className="mt-5" aria-label="Opciones de pago">

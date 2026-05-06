@@ -1136,7 +1136,7 @@ body {
   font-family: 'Nunito Sans', 'Calibri', sans-serif;
   font-size: 0.75rem;
   font-weight: 800;
-  color: rgba(15, 0, 84, 0.55);
+  color: var(--primary);
 }
 
 .partners-result-price-pill {
