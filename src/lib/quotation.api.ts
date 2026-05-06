@@ -300,7 +300,7 @@ export async function validateDiscountCode(code: string): Promise<DiscountValida
 
   if (res.status === 404) {
     const envelope = raw as BackendEnvelope<null>;
-    return { status: 'invalid', message: envelope.message ?? 'El código ingresado no es válido' };
+    return { status: 'invalid', message: 'El código ingresado no es válido' };
   }
 
   const text = typeof raw === 'string' ? raw : raw ? JSON.stringify(raw) : '';
