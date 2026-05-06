@@ -96,46 +96,56 @@ export type Qualification = {
   };
 };
 
-const DEFAULT_FIANZA_APROBACION_WEBHOOK_URL =
-  'https://hoggax.app.n8n.cloud/webhook/fianza-aprobacion';
+/** Identifica el partner para seleccionar el webhook n8n correspondiente. */
+export type PartnerKey = 'mob' | 'ce_brokers';
 
-function getFianzaAprobacionWebhookUrl(): string {
-  return process.env.NEXT_PUBLIC_N8N_FIANZA_APROBACION_WEBHOOK_URL || DEFAULT_FIANZA_APROBACION_WEBHOOK_URL;
+const PARTNER_DOMAIN_MAP: Record<string, PartnerKey> = {
+  'mob.com': 'mob',
+  'cebrokers.com': 'ce_brokers',
+};
+
+const PARTNER_WEBHOOK_ENV: Record<PartnerKey, string | undefined> = {
+  mob: process.env.NEXT_PUBLIC_N8N_MOB,
+  ce_brokers: process.env.NEXT_PUBLIC_N8N_CE_BROKERS,
+};
+
+/** Deriva el PartnerKey a partir del email del asesor. Retorna null si el dominio no es reconocido. */
+export function resolvePartnerKeyFromEmail(email: string): PartnerKey | null {
+  const domain = email.trim().toLowerCase().split('@')[1] ?? '';
+  return PARTNER_DOMAIN_MAP[domain] ?? null;
 }
 
-/**
- * Notifica a n8n cuando la calificación queda aprobada (status 4 o 5).
- * POST JSON: `{ "deal_id": <qualification.pipedrive_id> }` (mismo id que Pipedrive).
- * Si no hay `pipedrive_id`, no se envía nada (best-effort).
- */
 function toFiniteDealId(value: Qualification['pipedrive_id']): number | null {
   if (value == null) return null;
   const n = typeof value === 'number' ? value : Number(String(value).trim());
   return Number.isFinite(n) ? n : null;
 }
 
-export async function notifyFianzaAprobacionWebhook(qualification: Qualification): Promise<void> {
+/**
+ * Notifica a n8n cuando la calificación queda aprobada (status 4 o 5).
+ * El webhook destino se selecciona según el partner del asesor.
+ * Si no hay `pipedrive_id` o no se reconoce el partner, no se envía nada (best-effort).
+ */
+export async function notifyFianzaAprobacionWebhook(
+  qualification: Qualification,
+  agentEmail: string,
+): Promise<void> {
   const dealId = toFiniteDealId(qualification.pipedrive_id);
-  if (dealId == null) {
-    return;
-  }
+  if (dealId == null) return;
 
-  const url = getFianzaAprobacionWebhookUrl();
+  const partnerKey = resolvePartnerKeyFromEmail(agentEmail);
+  if (partnerKey == null) return;
+
+  const url = PARTNER_WEBHOOK_ENV[partnerKey];
+  if (!url) return;
 
   const controller = new AbortController();
-  const timeoutMs = 10_000;
-  const scheduleTimeout = typeof window !== 'undefined' ? window.setTimeout : setTimeout;
-  const clearScheduledTimeout = typeof window !== 'undefined' ? window.clearTimeout : clearTimeout;
-  const timeoutId = scheduleTimeout(() => controller.abort(), timeoutMs);
+  const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
   try {
     await fetch(url, {
       method: 'POST',
-      /**
-       * n8n (cloud) suele no permitir CORS para webhooks, y `application/json`
-       * dispara preflight. Con `no-cors` mandamos el request igual (respuesta opaca).
-       */
-      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
       keepalive: true,
       body: JSON.stringify({ deal_id: dealId }),
       signal: controller.signal,
@@ -143,7 +153,7 @@ export async function notifyFianzaAprobacionWebhook(qualification: Qualification
   } catch {
     // intentionally swallow
   } finally {
-    clearScheduledTimeout(timeoutId);
+    clearTimeout(timeoutId);
   }
 }
 

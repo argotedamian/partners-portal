@@ -436,7 +436,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
       }
 
       if ([QualificationStatusId.ApprovedQuotation, 5].includes(qualification.status_id)) {
-        void notifyFianzaAprobacionWebhook(qualification);
+        void notifyFianzaAprobacionWebhook(qualification, partnerAgent.email);
       }
 
       onComplete(qualification);
