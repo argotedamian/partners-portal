@@ -8,6 +8,7 @@ import { useAppState } from '@/state/AppStateContext';
 import { selectPartner, selectQualification } from '@/state/appState.selectors';
 import { QuotationEditPanel } from '@/components/quotation-edit-panel';
 import { PartnersQuotationApproved } from '@/components/partners-result/partners-quotation-approved';
+import { PartnersQualificationRejected } from '@/components/partners-result/partners-qualification-rejected';
 import { displayPlanAmount, paymentMethodsFromCotizacion } from '@/components/result-payment-methods';
 
 interface ResultProps {
@@ -400,45 +401,5 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
   }
 
   // Rechazada (cualquier otro caso: 7, 8, y fallback)
-  return (
-    <>
-      {/* Sección superior — blanco */}
-      <section className="py-8 sm:py-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="lg:w-1/2 lg:pr-12">
-            <h2 className="text-4xl sm:text-5xl text-label leading-snug">
-              {name ? `${name}, no` : 'No'} podemos ofrecerte una garantía.
-            </h2>
-          </div>
-        </div>
-      </section>
-
-      {/* Sección inferior — lilac */}
-      <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
-            <div>
-              <p className="text-xl text-label font-bold">
-                Desafortunadamente no contás con los requisitos mínimos para
-                solicitar nuestra garantía.
-              </p>
-              <p className="text-lg text-label/85 mt-2">
-                Si tenés más consultas, podés ver nuestra sección de Preguntas Frecuentes.
-              </p>
-            </div>
-            <div>
-              <a
-                href="https://hoggax.com/preguntas/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-6 py-3 border border-gray-500 rounded-lg font-medium hover:bg-white transition-colors"
-              >
-                Ver preguntas frecuentes
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-    </>
-  );
+  return <PartnersQualificationRejected />;
 }

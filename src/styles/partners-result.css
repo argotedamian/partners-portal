@@ -270,3 +270,165 @@
     min-height: 220px;
   }
 }
+
+/* ============================================
+   CALIFICACIÓN RECHAZADA (hero + CTA; pie global en Footer.tsx)
+   ============================================ */
+
+.qualification-rejected {
+  background: #ffffff;
+}
+
+.qualification-rejected-hero {
+  padding: 2rem 0 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .qualification-rejected-hero {
+    padding: 3rem 0 3.5rem;
+  }
+}
+
+.qualification-rejected-hero-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .qualification-rejected-hero-inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 2.5rem 3rem;
+    align-items: center;
+  }
+}
+
+.qualification-rejected-title {
+  margin: 0 0 1rem;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--primary);
+}
+
+.qualification-rejected-lead {
+  margin: 0 0 1rem;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--label-color);
+}
+
+.qualification-rejected-hint {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(15, 0, 84, 0.58);
+}
+
+.qualification-rejected-art {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+@media (min-width: 1024px) {
+  .qualification-rejected-art {
+    justify-content: flex-end;
+  }
+}
+
+.qualification-rejected-illustration {
+  width: 100%;
+  max-width: min(100%, 440px);
+  height: auto;
+}
+
+.qualification-rejected-cta-band {
+  background: #1b1b44;
+  padding: 2rem 0;
+}
+
+.qualification-rejected-cta-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  align-items: stretch;
+}
+
+@media (min-width: 768px) {
+  .qualification-rejected-cta-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+}
+
+.qualification-rejected-cta-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.qualification-rejected-cta-title {
+  margin: 0 0 0.5rem;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.qualification-rejected-cta-desc {
+  margin: 0;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(230, 236, 255, 0.88);
+  max-width: 42rem;
+}
+
+.qualification-rejected-cta-action {
+  flex-shrink: 0;
+}
+
+.qualification-rejected-cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  border-radius: 0.6rem;
+  background: var(--primary);
+  color: #ffffff;
+  font-family: 'Nunito Sans', 'Calibri', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 900;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .qualification-rejected-cta-button {
+    width: auto;
+    min-width: 14rem;
+    padding-left: 1.65rem;
+    padding-right: 1.65rem;
+  }
+}
+
+.qualification-rejected-cta-button:hover {
+  background: var(--primary-hover);
+}

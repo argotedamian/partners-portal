@@ -17,6 +17,7 @@ import {
   validateDiscountCode,
 } from '@/lib/quotation.api';
 import type { Qualification } from '@/lib/quotation.api';
+import { buildMockQualificationRejected } from '@/mocks/qualification-rejected';
 import { useAppDispatch } from '@/state/AppStateContext';
 
 /** Fijo en mock para URL de constancia / QR predecible (mismo criterio que `bail_number` real). */
@@ -338,18 +339,27 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
 
       dispatch({ type: 'quotation/setDraft', payload: { qualificationRequest } });
 
-      const shouldUseMock = process.env.NEXT_PUBLIC_USE_MOCK_RESULT === '1';
-      qualification = shouldUseMock
-        ? buildMockQualification({
-            rent: data.quotation.rent,
-            expenses: data.quotation.expenses,
-            term: data.quotation.term,
-            discountCode: data.quotation.discount_code || undefined,
-            tenantEmail: data.user_personal_data.email,
-            agentEmail: agent?.email ?? data.agent_email,
-          })
-        : await createQualification(qualificationRequest);
-      toast.success('Calificación procesada');
+      const mockMode = process.env.NEXT_PUBLIC_USE_MOCK_RESULT;
+      if (mockMode === '1') {
+        qualification = buildMockQualification({
+          rent: data.quotation.rent,
+          expenses: data.quotation.expenses,
+          term: data.quotation.term,
+          discountCode: data.quotation.discount_code || undefined,
+          tenantEmail: data.user_personal_data.email,
+          agentEmail: agent?.email ?? data.agent_email,
+        });
+        toast.success('Calificación procesada');
+      } else if (mockMode === 'rejected') {
+        qualification = buildMockQualificationRejected({
+          tenantEmail: data.user_personal_data.email,
+          agentEmail: agent?.email ?? data.agent_email,
+        });
+        toast.info('Mock: solicitud no aprobada');
+      } else {
+        qualification = await createQualification(qualificationRequest);
+        toast.success('Calificación procesada');
+      }
 
       if ([4, 5].includes(qualification.status_id)) {
         void notifyFianzaAprobacionWebhook(qualification);

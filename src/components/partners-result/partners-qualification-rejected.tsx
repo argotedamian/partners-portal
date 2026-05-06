@@ -1,0 +1,60 @@
+import Image from 'next/image';
+
+const FAQ_URL = 'https://hoggax.com/preguntas/';
+
+export function PartnersQualificationRejected() {
+  return (
+    <div className="qualification-rejected">
+      <section className="qualification-rejected-hero" aria-labelledby="qualification-rejected-title">
+        <div className="qualification-rejected-hero-inner">
+          <div className="qualification-rejected-copy">
+            <h1 id="qualification-rejected-title" className="qualification-rejected-title">
+              No podemos aprobar tu garantía en este momento
+            </h1>
+            <p className="qualification-rejected-lead">
+              Según la información ingresada, no cumplís con los requisitos para otorgarte una garantía Hoggax.
+            </p>
+            <p className="qualification-rejected-hint">
+              Si querés que revisemos tu caso o conocer otras alternativas, contactanos.
+            </p>
+          </div>
+          <div className="qualification-rejected-art" aria-hidden="true">
+            <Image
+              src="/mujer-centada.svg"
+              alt=""
+              width={489}
+              height={345}
+              className="qualification-rejected-illustration"
+              priority
+              unoptimized
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="qualification-rejected-cta-band" aria-labelledby="qualification-rejected-cta-title">
+        <div className="qualification-rejected-cta-inner">
+          <div className="qualification-rejected-cta-text">
+            <h2 id="qualification-rejected-cta-title" className="qualification-rejected-cta-title">
+              ¿Necesitás más información?
+            </h2>
+            <p className="qualification-rejected-cta-desc">
+              Conocé los requisitos de aprobación y las opciones disponibles, como la posibilidad de sumar un
+              co-garante.
+            </p>
+          </div>
+          <div className="qualification-rejected-cta-action">
+            <a
+              href={FAQ_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="qualification-rejected-cta-button"
+            >
+              Ir a preguntas frecuentes
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

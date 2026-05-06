@@ -1,0 +1,20 @@
+{
+  "status_id": 7,
+  "is_quotation_only": false,
+  "id": null,
+  "bail_number": null,
+  "pipedrive_id": null,
+  "quotation_id": null,
+  "api_res_data": {
+    "idHoggax": null,
+    "front": {
+      "nombre": "Usuario",
+      "agente": {
+        "nombre": "Agente demo",
+        "email": "agente@demo.com",
+        "telefono": "",
+        "foto": null
+      }
+    }
+  }
+}
