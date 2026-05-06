@@ -317,6 +317,11 @@ export function Form({ onComplete }: FormProps) {
             })}
           />
 
+          <input
+            type="hidden"
+            {...register('user_personal_data.document_type_id', { valueAsNumber: true })}
+          />
+
           <div className="form-group">
             <label>Documento de identidad <span className="required-star">*</span></label>
             <div className="identity-grid">

@@ -339,9 +339,14 @@ export async function createQualification(body: QualificationRequest): Promise<Q
     throw new Error(`Unexpected qualification response.${validation}`);
   }
 
+  const statusId = Number(qualification.status_id);
+  /** Alineado con mocks y `Result`: estado 4 = cotización aprobada → UI partners (`PartnersQuotationApproved`). */
+  const isQuotationApproved =
+    Number.isFinite(statusId) && statusId === 4;
+
   return {
-    status_id: qualification.status_id,
-    is_quotation_only: false,
+    status_id: Number.isFinite(statusId) ? statusId : qualification.status_id,
+    is_quotation_only: isQuotationApproved,
     id: qualification.id,
     bail_number: qualification.bail_number ?? null,
     pipedrive_id: toFiniteDealId(qualification.pipedrive_id),

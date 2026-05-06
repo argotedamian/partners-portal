@@ -22,7 +22,7 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
   const [copied, setCopied] = useState(false);
   const qualification = qualificationProp ?? selectQualification(state);
   if (!qualification) return null;
-  const statusId = qualification.status_id;
+  const statusId = Number(qualification.status_id);
   const partner = selectPartner(state);
 
   const buildConstanciaAprobacionUrl = (bailNumber: string): string => {

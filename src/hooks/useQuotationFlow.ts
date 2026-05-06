@@ -257,6 +257,11 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
       shouldDirty: true,
     });
   }, [advisorEmailFromStore, setValue]);
+
+  /** Mantiene `document_type_id` en el estado de RHF (requerido por el backend); el selector no usa `register`. */
+  useEffect(() => {
+    setValue('user_personal_data.document_type_id', selectedDocType);
+  }, [selectedDocType, setValue]);
   const discountCode = watch('quotation.discount_code');
   const selectedGenderId = watch('user_personal_data.gender_id');
 
@@ -298,7 +303,8 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         return;
       }
 
-      const { document_value, document_type_id, first_name, last_name } = data.user_personal_data;
+      const { document_value, first_name, last_name } = data.user_personal_data;
+      const document_type_id = data.user_personal_data.document_type_id ?? selectedDocType;
 
       let qualification: Qualification;
 
