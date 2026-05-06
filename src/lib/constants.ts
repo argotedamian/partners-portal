@@ -19,6 +19,9 @@ export const GENDERS = [
   { id: 2, name: 'Masculino' },
 ];
 
+/** Coincide con `EMPLOYMENT_SITUATIONS[0]` — sin antigüedad ni ingresos en formulario/API. */
+export const EMPLOYMENT_STUDENT_ID = 1;
+
 export const EMPLOYMENT_SITUATIONS = [
   { id: 1, name: 'Estudiante universitario' },
   { id: 2, name: 'Jubilado/a' },

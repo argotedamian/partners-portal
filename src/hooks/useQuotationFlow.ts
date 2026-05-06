@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import {
   PARTNERS_AGENTS,
   DOCUMENT_TYPES,
+  EMPLOYMENT_STUDENT_ID,
   GENDERS,
   EMPLOYMENT_SITUATIONS,
   ANTIQUITIES,
@@ -215,6 +216,8 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
   const discountTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const form = useForm<FormValues>({
+    mode: 'onChange',
+    shouldUnregister: true,
     defaultValues: {
       user_personal_data: {
         document_type_id: 1,
@@ -284,11 +287,6 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         return;
       }
 
-      if (document_type_id === 2 && (!first_name?.trim() || !last_name?.trim())) {
-        toast.error('Ingresá nombre y apellido');
-        return;
-      }
-
       const normalizedGenderId = normalizeNullableNumber(data.user_personal_data.gender_id);
       const normalizedEmploymentSituationId = normalizeNullableNumber(data.user_personal_data.employment_situation_id);
       const normalizedAntiquityId = normalizeNullableNumber(data.user_personal_data.antiquity_id);
@@ -304,7 +302,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         return;
       }
 
-      if (normalizedEmploymentSituationId !== 1) {
+      if (normalizedEmploymentSituationId !== EMPLOYMENT_STUDENT_ID) {
         if (!normalizedAntiquityId) {
           toast.error('Seleccioná la antigüedad');
           return;
@@ -324,8 +322,10 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         phone: sanitizeNumericInput(data.user_personal_data.phone),
         email: data.user_personal_data.email,
         employment_situation_id: normalizedEmploymentSituationId,
-        antiquity_id: normalizedEmploymentSituationId === 1 ? null : normalizedAntiquityId,
-        monthly_income: normalizedEmploymentSituationId === 1 ? null : normalizedMonthlyIncome,
+        antiquity_id:
+          normalizedEmploymentSituationId === EMPLOYMENT_STUDENT_ID ? null : normalizedAntiquityId,
+        monthly_income:
+          normalizedEmploymentSituationId === EMPLOYMENT_STUDENT_ID ? null : normalizedMonthlyIncome,
         ...(document_type_id === 2 ? { first_name, last_name } : {}),
       };
 

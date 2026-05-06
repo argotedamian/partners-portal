@@ -94,6 +94,16 @@
   gap: 0.6rem;
 }
 
+.passport-name-fields {
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .passport-name-fields.grid-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
 .gender-segment {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -133,6 +143,10 @@
 @media (min-width: 768px) {
   .grid-fields {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .grid-fields.labor-fields-student {
+    grid-template-columns: 1fr;
   }
 
   .grid-fields-three {
@@ -392,12 +406,20 @@
   background: #b7b6d8 !important;
   border: none;
   border-radius: 0.5rem;
+  cursor: not-allowed;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.form-submit button:not(:disabled) {
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .form-submit button:hover:not(:disabled) {
-  background: #a8a7cf !important;
+  background: var(--primary) !important;
+}
+
+.form-submit button:active:not(:disabled) {
+  background: var(--primary-hover) !important;
 }
 
 .form-submit button:disabled {
