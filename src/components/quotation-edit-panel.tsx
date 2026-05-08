@@ -135,10 +135,6 @@ export function QuotationEditPanel() {
   const [values, setValues] = useState<EditValues>(initialValues);
 
   useEffect(() => {
-    setValues(initialValues);
-  }, [initialValues]);
-
-  useEffect(() => {
     if (!isExpanded) return;
     firstInputRef.current?.focus();
   }, [isExpanded]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useCallback, useEffect, useId, useState } from 'react';
+import { type FormEvent, useCallback, useId, useState } from 'react';
 import { toast } from 'sonner';
 
 type ShareCertificatePanelProps = {
@@ -18,11 +18,7 @@ export function ShareCertificatePanel({ qrValue }: ShareCertificatePanelProps) {
   const emailInputId = useId();
 
   const [shareEmail, setShareEmail] = useState('');
-  const [canNativeShare, setCanNativeShare] = useState(false);
-
-  useEffect(() => {
-    setCanNativeShare(typeof navigator.share === 'function');
-  }, []);
+  const [canNativeShare] = useState(() => typeof navigator !== 'undefined' && typeof navigator.share === 'function');
 
   const handleNativeShare = useCallback(async () => {
     try {

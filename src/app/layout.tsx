@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { AppStateProvider } from "@/state/AppStateContext";
+import { AuthGate } from "@/components/auth-gate";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -88,8 +89,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen bg-white font-sans antialiased" suppressHydrationWarning>
         <AppStateProvider>
-          <Navbar />
-          {children}
+          <AuthGate>
+            <Navbar />
+            {children}
+          </AuthGate>
         </AppStateProvider>
       </body>
     </html>

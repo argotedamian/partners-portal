@@ -2,11 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useNavbarState } from '@/hooks/useNavbarState';
+import { clearSession } from '@/lib/auth-session';
+import { useAppDispatch } from '@/state/AppStateContext';
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const { isAuthenticated, advisorLabel, partnerLogoSrc, partner } = useNavbarState();
 
   if (pathname?.startsWith('/compartir-certificado')) {
@@ -24,6 +28,13 @@ export function Navbar() {
         <div className="navbar-spacer" aria-hidden="true" />
       </>
     );
+  }
+
+  function onLogout() {
+    clearSession();
+    dispatch({ type: 'quotation/resetQualification' });
+    dispatch({ type: 'quotation/setAdvisorEmail', payload: '' });
+    router.replace('/login');
   }
 
   return (
@@ -69,6 +80,13 @@ export function Navbar() {
 
           <div className="navbar-auth-right">
             <span className="navbar-auth-advisor">{advisorLabel}</span>
+            <button
+              type="button"
+              onClick={onLogout}
+              className="ml-3 rounded-lg border border-[rgba(15,0,84,0.18)] bg-white px-3 py-1 text-[12px] font-extrabold text-[var(--primary)] hover:bg-[rgba(15,0,84,0.04)] active:bg-[rgba(15,0,84,0.06)]"
+            >
+              Salir
+            </button>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/user-logo.svg"

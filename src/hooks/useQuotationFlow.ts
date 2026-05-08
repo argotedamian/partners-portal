@@ -298,9 +298,9 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
     }
 
     try {
-      const partnerAgent = resolvePartnerAgent(data.agent_email);
+      const partnerAgent = resolvePartnerAgent(advisorEmailFromStore ?? '');
       if (!partnerAgent.email.trim() || !isAllowedAdvisorEmailFromMock(partnerAgent.email)) {
-        toast.error('Seleccioná un asesor habilitado');
+        toast.error('Tu sesión no tiene un asesor habilitado. Volvé a iniciar sesión.');
         setIsLoading(false);
         return;
       }
