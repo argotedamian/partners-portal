@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ import { isValidPartnerMockCredentials } from '@/lib/partner-users-mock';
 import { writeSession } from '@/lib/auth-session';
 import { useAppDispatch } from '@/state/AppStateContext';
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
@@ -168,6 +168,14 @@ export default function LoginPage() {
         <Footer />
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <LoginPageInner />
+    </Suspense>
   );
 }
 
