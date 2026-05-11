@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Partners Portal (`partners-portal`)
 
-## Getting Started
+Portal de partners (asesores inmobiliarios) para generar **cotizaciones** y **calificaciones** contra el backend.
 
-First, run the development server:
+## Requisitos
+
+- Node.js (recomendado 20+)
+- npm
+
+## Setup
+
+Instalar dependencias:
+
+```bash
+npm install
+```
+
+Levantar en desarrollo:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variables de entorno
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Este proyecto usa variables `NEXT_PUBLIC_*` (expuestas al cliente). Ver `.env` / `.env.local`.
 
-## Learn More
+- **`NEXT_PUBLIC_BACKEND_URL`**: base URL del backend (Laravel).
+  - Usado por `src/lib/quotation.api.ts`
+  - Endpoints consumidos:
+    - `POST /api/web/v2/discounts/validate`
+    - `POST /api/web/v2/individual/quotations`
+    - `POST /api/web/v2/individual/qualifications`
 
-To learn more about Next.js, take a look at the following resources:
+- **`NEXT_PUBLIC_N8N_MOB`** / **`NEXT_PUBLIC_N8N_CE_BROKERS`** (opcionales): webhooks de n8n a notificar cuando una calificación queda aprobada (best-effort).
+  - Se resuelve el webhook por dominio del asesor (`mob.com` → `mob`, `cebrokers.com` → `ce_brokers`)
+  - Ver `notifyFianzaAprobacionWebhook` en `src/lib/quotation.api.ts`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **`NEXT_PUBLIC_USE_MOCK_RESULT`** (opcional): fuerza respuestas mock para la calificación (si está vacío/no seteado, se llama a la API real).
+  - Valores soportados (ver `src/mocks/qualification-mock-mode.enum.ts`):
+    - `1`: cotización aprobada (mock)
+    - `rejected` / `7` / `8`: rechazo (mock)
+    - `6` / `9` / `11` / `13`: estados intermedios (mock)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ejemplo (mac/linux):
 
-## Deploy on Vercel
+```bash
+NEXT_PUBLIC_BACKEND_URL="https://backend-laravel.hoggax.com" \
+NEXT_PUBLIC_USE_MOCK_RESULT="1" \
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Mocks de partners (login/asesores)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Hay mocks estáticos en `public/mocks/` que se importan desde el frontend:
+
+- **`public/mocks/partner-users.json`**: credenciales válidas en modo mock (email/password).
+  - Ver helper `isValidPartnerMockCredentials` en `src/lib/partner-users-mock.ts`
+
+- **`public/mocks/partners.json`**: lista de asesores habilitados (nombre, email, logo, comisión).
+  - Ver helpers `isAllowedAdvisorEmailFromMock` / `resolvePartnerAgent` en `src/lib/partners-mock.ts`
+
+## Build / Export
+
+El proyecto está configurado como **export estático** (ver `next.config.ts`):
+
+- `output: 'export'`
+- `trailingSlash: true`
+
+Generar build:
+
+```bash
+npm run build
+```
+
+El output queda en `out/` (para servir estático).
