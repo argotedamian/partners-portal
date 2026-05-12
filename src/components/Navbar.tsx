@@ -22,7 +22,7 @@ export function Navbar() {
       <>
         <nav className="navbar-host navbar-host--guest" aria-label="Principal">
           <div className="navbar-inner navbar-inner--guest">
-            <p className="navbar-guest-title">Cotizador de garantías</p>
+            <p className="navbar-guest-title">Gestor de garantías</p>
           </div>
         </nav>
         <div className="navbar-spacer" aria-hidden="true" />

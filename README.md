@@ -1,6 +1,6 @@
 # Partners Portal (`partners-portal`)
 
-Portal de partners (asesores inmobiliarios) para generar **cotizaciones** y **calificaciones** contra el backend.
+Portal de partners (asesores inmobiliarios) para generar **gestiones** y **calificaciones** contra el backend.
 
 ## Requisitos
 
@@ -40,7 +40,7 @@ Este proyecto usa variables `NEXT_PUBLIC_*` (expuestas al cliente). Ver `.env` /
 
 - **`NEXT_PUBLIC_USE_MOCK_RESULT`** (opcional): fuerza respuestas mock para la calificación (si está vacío/no seteado, se llama a la API real).
   - Valores soportados (ver `src/mocks/qualification-mock-mode.enum.ts`):
-    - `1`: cotización aprobada (mock)
+    - `1`: gestión aprobada (mock)
     - `rejected` / `7` / `8`: rechazo (mock)
     - `6` / `9` / `11` / `13`: estados intermedios (mock)
 

@@ -3,12 +3,12 @@ import { Suspense } from 'react';
 import { HomeClient } from './HomeClient';
 
 export const metadata = {
-  title: 'Cotizá una garantía',
-  description: 'Cotizá una garantía Hoggax en minutos. Portal de partners para generar cotizaciones rápidas y seguras.',
+  title: 'Gestiona una garantía',
+  description: 'Gestiona una garantía Hoggax en minutos. Portal de partners para generar gestiones rápidas y seguras.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Cotizá una garantía | Hoggax Partners',
-    description: 'Cotizá una garantía Hoggax en minutos. Portal de partners.',
+    title: 'Gestiona una garantía | Hoggax Partners',
+    description: 'Gestiona una garantía Hoggax en minutos. Portal de partners.',
     url: 'https://partners.hoggax.com/',
   },
 };

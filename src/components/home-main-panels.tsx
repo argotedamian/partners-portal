@@ -13,12 +13,12 @@ export function HomeMainLeftPanel({
     <section className="flex h-full flex-col rounded-2xl bg-white p-3 sm:p-4 lg:p-0">
       <div className="pt-1 sm:pt-2 lg:pt-0">
         <h1 className="text-3xl font-extrabold leading-[1.05] text-label sm:text-4xl lg:text-[42px] xl:text-[44px] 2xl:text-[50px] lg:tracking-[-0.02em]">
-          Cotizá una <span className="text-[var(--primary)]">garantía</span>
+          Gestiona una <span className="text-[var(--primary)]">garantía</span>
           <br />
           <span className="text-[var(--primary)]">Hoggax</span>
         </h1>
         <p className="mt-3 max-w-[560px] text-[14px] font-semibold text-label/65 sm:text-[15px]">
-          Bienvenido/a al portal de Partners. Cotizá una garantía Hoggax en minutos.
+          Bienvenido/a al portal de Partners. Gestiona una garantía Hoggax en minutos.
         </p>
       </div>
 

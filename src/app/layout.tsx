@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     default: "Hoggax Partners",
     template: "%s | Hoggax Partners",
   },
-  description: "Portal de cotización de garantías Hoggax para partners.",
+  description: "Portal de gestión de garantías Hoggax para partners.",
   applicationName: "Hoggax Partners",
-  keywords: ["Hoggax", "Partners", "garantía", "garantía de alquiler", "cotización"],
+  keywords: ["Hoggax", "Partners", "garantía", "garantía de alquiler", "gestión"],
   category: "finance",
   creator: "Hoggax",
   publisher: "Hoggax",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     url: "https://partners.hoggax.com/",
     siteName: "Hoggax Partners",
     title: "Hoggax Partners",
-    description: "Portal de cotización de garantías Hoggax para partners.",
+    description: "Portal de gestión de garantías Hoggax para partners.",
     locale: "es_AR",
     images: [
       {
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Hoggax Partners",
-    description: "Portal de cotización de garantías Hoggax para partners.",
+    description: "Portal de gestión de garantías Hoggax para partners.",
     images: ["/twitter-image"],
   },
   robots: {

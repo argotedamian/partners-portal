@@ -71,7 +71,7 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
     const lines = [
       `Hola ${firstName},`,
       '',
-      'Te compartimos la cotización de tu garantía Hoggax:',
+      'Te compartimos la gestión de tu garantía Hoggax:',
       '',
       `Corresponde a un alquiler mensual de ${montoAlquiler} ${expensasTexto}.`,
       `Valor final con IVA incluido por un contrato de ${plazoContratoMeses} meses.`,
@@ -137,7 +137,7 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
             {qualification.is_quotation_only ? (
               <>
                 <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
-                  Tu cotización está lista
+                  Tu gestión está lista
                 </h2>
                 <p className="text-4xl sm:text-5xl text-label">
                   Mirá el <strong className="font-extrabold">valor del servicio</strong>{' '}

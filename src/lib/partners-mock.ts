@@ -15,7 +15,7 @@ const EMAIL_INDEX = new Map(
   PARTNERS_MOCK_LIST.map((p) => [p.email.trim().toLowerCase(), p] as const),
 );
 
-/** Email permitido para cotizar según mock estático `/public/mocks/partners.json`. */
+/** Email permitido para gestionar según mock estático `/public/mocks/partners.json`. */
 export function isAllowedAdvisorEmailFromMock(value: string): boolean {
   const email = value.trim().toLowerCase();
   if (!email) return false;

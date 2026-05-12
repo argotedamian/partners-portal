@@ -509,7 +509,7 @@ export function Form({ onComplete }: FormProps) {
 
         <div className="form-submit">
           <button type="submit" disabled={isLoading || !isValid || !isAuthenticated}>
-            {isLoading ? 'Cargando...' : 'Cotizar'}
+            {isLoading ? 'Cargando...' : 'Gestionar'}
           </button>
         </div>
       </form>

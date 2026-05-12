@@ -58,7 +58,7 @@ function LoginPageInner() {
         <div className="mx-auto flex w-full max-w-[1536px] flex-col px-4 pb-10 pt-[5.25rem] sm:px-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 lg:pb-12 lg:pt-[6.25rem] xl:px-10 2xl:px-14">
           <section className="flex min-w-0 flex-1 flex-col justify-center">
             <h1 className="text-[34px] font-extrabold leading-[1.05] text-label sm:text-[42px] lg:text-[48px]">
-              Cotizá una <span className="text-[var(--primary)]">garantía</span>
+              Gestiona una <span className="text-[var(--primary)]">garantía</span>
               <br />
               <span className="text-[var(--primary)]">Hoggax</span> en segundos
             </h1>

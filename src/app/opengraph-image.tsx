@@ -50,7 +50,7 @@ export default function OpenGraphImage() {
               Hoggax Partners
             </div>
             <div style={{ fontSize: 32, fontWeight: 700, color: "#0F0054", marginTop: 18 }}>
-              Cotizá garantías de alquiler para tus clientes
+              Gestiona garantías de alquiler para tus clientes
             </div>
           </div>
 

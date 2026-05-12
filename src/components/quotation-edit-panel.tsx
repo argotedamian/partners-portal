@@ -211,7 +211,7 @@ export function QuotationEditPanel() {
       dispatch({ type: 'quotation/setDraft', payload: { qualificationRequest: patchedRequest } });
       const nextQualification = await createQualification(patchedRequest);
       dispatch({ type: 'quotation/setQualification', payload: nextQualification });
-      toast.success('Cotización actualizada');
+      toast.success('Gestión actualizada');
       runQuotationEditTransition(() => {
         setIsExpanded(false);
       });
@@ -226,11 +226,11 @@ export function QuotationEditPanel() {
   return (
     <section
       className={`quotation-edit-host${isExpanded ? ' quotation-edit-host--expanded' : ''}`}
-      aria-label="Editar cotización"
+      aria-label="Editar gestión"
     >
       {!isExpanded ? (
         <div className="quotation-edit-summary">
-          <div className="quotation-edit-items" aria-label="Resumen de cotización">
+          <div className="quotation-edit-items" aria-label="Resumen de gestión">
             <div className="quotation-edit-item">
               <span className="quotation-edit-label">Alquiler inicial</span>
               <span className="quotation-edit-value">{formatArs(values.rent)}</span>
@@ -267,7 +267,7 @@ export function QuotationEditPanel() {
           className="quotation-edit-expanded-shell"
           id="quotation-edit-expanded-panel"
           role="region"
-          aria-label="Formulario de edición de cotización"
+          aria-label="Formulario de edición de gestión"
         >
           <div className="quotation-edit-expanded-head">
             <button
@@ -416,7 +416,7 @@ export function QuotationEditPanel() {
                 onClick={onRecalculate}
                 disabled={isLoading}
               >
-                <span>{isLoading ? 'Recalculando…' : 'Cotizar mi garantía'}</span>
+                <span>{isLoading ? 'Recalculando…' : 'Gestionar mi garantía'}</span>
                 {!isLoading ? <ArrowRightIcon /> : null}
               </button>
             </div>
