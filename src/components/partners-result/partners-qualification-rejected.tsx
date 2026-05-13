@@ -18,7 +18,7 @@ export function PartnersQualificationRejected({ tenantName }: PartnersQualificat
         <button
           type="button"
           onClick={() => dispatch({ type: 'quotation/resetQualification' })}
-          className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[var(--primary)] hover:opacity-70 transition-opacity"
+          className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#837F9B] hover:opacity-70 transition-opacity"
           aria-label="Volver al formulario principal"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">

@@ -65,29 +65,29 @@ export function PartnersQuotationApproved({
   return (
     <div className="partners-result-approved overflow-x-hidden">
       <section className="partners-result-top py-5 sm:py-7">
-        <div className="px-4 sm:px-8 lg:px-12 pb-3">
-          <button
-            type="button"
-            onClick={() => dispatch({ type: 'quotation/resetQualification' })}
-            className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[var(--primary)] hover:opacity-70 transition-opacity"
-            aria-label="Volver al formulario principal"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
         <div className="partners-result-editbar partners-result-editbar--full w-full px-4 sm:px-8 lg:px-12">
           <QuotationEditPanel />
         </div>
 
         <div className="max-w-6xl mx-auto px-4">
           <div className="partners-result-hero text-center pt-4 sm:pt-5">
-            <h2 className="partners-result-title text-[var(--app-green)] font-extrabold text-[32px] leading-[1.05] sm:text-[44px]">
-              {tenantName
-                ? `La garantía de ${tenantName} está aprobada.`
-                : 'La garantía está aprobada.'}
-            </h2>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => dispatch({ type: 'quotation/resetQualification' })}
+                className="absolute left-0 top-0 inline-flex items-center text-[#837F9B] hover:opacity-70 transition-opacity"
+                aria-label="Volver al formulario principal"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <h2 className="partners-result-title text-[var(--app-green)] font-extrabold text-[32px] leading-[1.05] sm:text-[44px]">
+                {tenantName
+                  ? `La garantía de ${tenantName} está aprobada.`
+                  : 'La garantía está aprobada.'}
+              </h2>
+            </div>
             <p className="partners-result-subtitle font-bold text-label mt-3 text-[18px] sm:text-[22px]">
               Conocé las opciones de pago
             </p>
