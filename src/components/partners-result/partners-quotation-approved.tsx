@@ -7,6 +7,7 @@ import { QuoterPlanCard } from '@/components/quoter-plan-card';
 import { PartnersCommissionBanner } from '@/components/partners-result/partners-commission-banner';
 import { PartnersCertificatePlaceholder } from '@/components/partners-result/partners-certificate-placeholder';
 import { buildPartnersCertificateQrValue } from '@/lib/partners-certificate-qr';
+import { useAppDispatch } from '@/state/AppStateContext';
 
 type CotizacionLike = NonNullable<Qualification['api_res_data']>['cotizacion'];
 
@@ -58,11 +59,24 @@ export function PartnersQuotationApproved({
     discountPct > 0 && priceFinal != null && Number.isFinite(priceFinal);
   const sinDescuentoImporte = resolveSinDescuentoImporte(priceRaw, priceFinal, discountPct);
 
+  const dispatch = useAppDispatch();
   const tenantName = qualification?.api_res_data?.front?.nombre?.trim() ?? '';
 
   return (
     <div className="partners-result-approved overflow-x-hidden">
       <section className="partners-result-top py-5 sm:py-7">
+        <div className="px-4 sm:px-8 lg:px-12 pb-3">
+          <button
+            type="button"
+            onClick={() => dispatch({ type: 'quotation/resetQualification' })}
+            className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[var(--primary)] hover:opacity-70 transition-opacity"
+            aria-label="Volver al formulario principal"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
         <div className="partners-result-editbar partners-result-editbar--full w-full px-4 sm:px-8 lg:px-12">
           <QuotationEditPanel />
         </div>

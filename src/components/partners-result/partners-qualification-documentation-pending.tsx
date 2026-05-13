@@ -2,6 +2,7 @@
 
 import { toast } from 'sonner';
 import type { Qualification } from '@/lib/quotation.api';
+import { useAppDispatch } from '@/state/AppStateContext';
 
 type PartnersQualificationDocumentationPendingProps = {
   qualification: Qualification;
@@ -13,6 +14,7 @@ export function PartnersQualificationDocumentationPending({
   const agentEmail =
     qualification?.api_res_data?.front?.agente?.email?.trim() ?? '';
 
+  const dispatch = useAppDispatch();
   const tenantName = qualification?.api_res_data?.front?.nombre?.trim() ?? '';
 
   function handleSendToAdvisor() {
@@ -33,6 +35,18 @@ export function PartnersQualificationDocumentationPending({
         <div className="partners-doc-pending-decor" aria-hidden />
 
         <div className="relative mx-auto max-w-6xl px-4">
+          <div className="pb-4">
+            <button
+              type="button"
+              onClick={() => dispatch({ type: 'quotation/resetQualification' })}
+              className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[var(--primary)] hover:opacity-70 transition-opacity"
+              aria-label="Volver al formulario principal"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M19 12H5M12 5l-7 7 7 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
           <div className="partners-doc-pending-hero mx-auto max-w-3xl text-center">
             <h2 className="partners-doc-pending-title font-extrabold text-[var(--app-green)]">
               {tenantName

@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useNavbarState } from '@/hooks/useNavbarState';
 import { clearSession } from '@/lib/auth-session';
@@ -42,7 +41,12 @@ export function Navbar() {
       <nav className="navbar-host navbar-host--auth" aria-label="Principal">
         <div className="navbar-inner navbar-inner--auth">
           <div className="navbar-auth-left">
-            <Link href="/?reset=1" className="navbar-auth-brand" aria-label="Hoggax — inicio">
+            <button
+              type="button"
+              className="navbar-auth-brand"
+              aria-label="Hoggax — inicio"
+              onClick={() => dispatch({ type: 'quotation/resetQualification' })}
+            >
               <span className="navbar-auth-logos-row">
                 <span className="navbar-auth-logo-box navbar-auth-logo-box--hoggax">
                   <Image
@@ -75,7 +79,7 @@ export function Navbar() {
                   />
                 </span>
               </span>
-            </Link>
+            </button>
           </div>
 
           <div className="navbar-auth-right">
