@@ -2,20 +2,26 @@ import Image from 'next/image';
 
 const FAQ_URL = 'https://hoggax.com/preguntas/';
 
-export function PartnersQualificationRejected() {
+type PartnersQualificationRejectedProps = {
+  tenantName?: string;
+};
+
+export function PartnersQualificationRejected({ tenantName }: PartnersQualificationRejectedProps) {
   return (
     <div className="qualification-rejected">
       <section className="qualification-rejected-hero" aria-labelledby="qualification-rejected-title">
         <div className="qualification-rejected-hero-inner">
           <div className="qualification-rejected-copy">
             <h1 id="qualification-rejected-title" className="qualification-rejected-title">
-              No podemos aprobar tu garantía en este momento
+              {tenantName
+                ? `No podemos aprobar la garantía de ${tenantName} en este momento`
+                : 'No podemos aprobar la garantía en este momento'}
             </h1>
             <p className="qualification-rejected-lead">
-              Según la información ingresada, no cumplís con los requisitos para otorgarte una garantía Hoggax.
+              Según la información ingresada, el inquilino no cumple con los requisitos para obtener una garantía Hoggax.
             </p>
             <p className="qualification-rejected-hint">
-              Si querés que revisemos tu caso o conocer otras alternativas, contactanos.
+              Si querés que revisemos el caso o conocer otras alternativas, contactanos.
             </p>
           </div>
           <div className="qualification-rejected-art" aria-hidden="true">

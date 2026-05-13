@@ -13,9 +13,11 @@ export function PartnersQualificationDocumentationPending({
   const agentEmail =
     qualification?.api_res_data?.front?.agente?.email?.trim() ?? '';
 
+  const tenantName = qualification?.api_res_data?.front?.nombre?.trim() ?? '';
+
   function handleSendToAdvisor() {
     if (!agentEmail) {
-      toast.info('Tu asesor te va a contactar con los próximos pasos.');
+      toast.info('Un asesor va a contactar al inquilino con los próximos pasos.');
       return;
     }
     const subject = encodeURIComponent('Documentación — garantía Hoggax');
@@ -33,10 +35,12 @@ export function PartnersQualificationDocumentationPending({
         <div className="relative mx-auto max-w-6xl px-4">
           <div className="partners-doc-pending-hero mx-auto max-w-3xl text-center">
             <h2 className="partners-doc-pending-title font-extrabold text-[var(--app-green)]">
-              ¡Estás a un paso de obtener tu garantía!
+              {tenantName
+                ? `¡${tenantName} está a un paso de obtener su garantía!`
+                : '¡El inquilino está a un paso de obtener su garantía!'}
             </h2>
             <p className="partners-doc-pending-lead mt-4 text-[var(--label-color)]">
-              Para continuar con la solicitud, necesitamos validar tu documentación e ingresos.
+              Para continuar con la solicitud, necesitamos validar la documentación e ingresos del inquilino.
             </p>
           </div>
 

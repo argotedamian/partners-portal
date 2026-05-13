@@ -58,6 +58,8 @@ export function PartnersQuotationApproved({
     discountPct > 0 && priceFinal != null && Number.isFinite(priceFinal);
   const sinDescuentoImporte = resolveSinDescuentoImporte(priceRaw, priceFinal, discountPct);
 
+  const tenantName = qualification?.api_res_data?.front?.nombre?.trim() ?? '';
+
   return (
     <div className="partners-result-approved overflow-x-hidden">
       <section className="partners-result-top py-5 sm:py-7">
@@ -68,7 +70,9 @@ export function PartnersQuotationApproved({
         <div className="max-w-6xl mx-auto px-4">
           <div className="partners-result-hero text-center pt-4 sm:pt-5">
             <h2 className="partners-result-title text-[var(--app-green)] font-extrabold text-[32px] leading-[1.05] sm:text-[44px]">
-              Tu garantía Hoggax está aprobada.
+              {tenantName
+                ? `La garantía de ${tenantName} está aprobada.`
+                : 'La garantía está aprobada.'}
             </h2>
             <p className="partners-result-subtitle font-bold text-label mt-3 text-[18px] sm:text-[22px]">
               Conocé las opciones de pago

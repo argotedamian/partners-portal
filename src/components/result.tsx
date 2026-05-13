@@ -395,5 +395,5 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
   }
 
   // Rechazada (cualquier otro caso: 7, 8, y fallback)
-  return <PartnersQualificationRejected />;
+  return <PartnersQualificationRejected tenantName={name || undefined} />;
 }
