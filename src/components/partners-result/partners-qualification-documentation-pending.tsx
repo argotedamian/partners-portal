@@ -2,7 +2,80 @@
 
 import { toast } from 'sonner';
 import type { Qualification } from '@/lib/quotation.api';
-import { useAppDispatch } from '@/state/AppStateContext';
+import { useAppDispatch, useAppState } from '@/state/AppStateContext';
+import { selectQuotationDraft } from '@/state/appState.selectors';
+
+type DocCard = { title: string; sub: string; img: string };
+
+const DNI_CARD: DocCard = {
+  title: 'Documento de identidad vigente',
+  sub: '(Documento de identidad)',
+  img: '/documento.svg',
+};
+
+const PASSPORT_CARD: DocCard = {
+  title: 'Documento de identidad vigente',
+  sub: '(Pasaporte o documento extranjero)',
+  img: '/documento.svg',
+};
+
+const DNI_FRENTE_DORSO_CARD: DocCard = {
+  title: 'Foto del DNI',
+  sub: '(Frente y dorso)',
+  img: '/documento.svg',
+};
+
+const DOC_CARDS_BY_SITUATION: Record<number, DocCard[]> = {
+  1: [
+    DNI_CARD,
+    { title: 'Constancia de alumno regular', sub: '(Comprobante de inscripción universitaria)', img: '/comprobante-ingresos.svg' },
+  ],
+  2: [
+    DNI_CARD,
+    { title: 'Recibos de jubilación', sub: '(Últimos 3 recibos de jubilación)', img: '/recibo-sueldo.svg' },
+  ],
+  3: [
+    DNI_FRENTE_DORSO_CARD,
+    { title: 'Recibos de monotributo', sub: '(Últimos 3 recibos de monotributo)', img: '/recibo-sueldo.svg' },
+  ],
+  4: [
+    DNI_CARD,
+    { title: 'Recibos de sueldo', sub: '(Últimos 3 recibos de sueldo)', img: '/recibo-sueldo.svg' },
+  ],
+  5: [
+    DNI_FRENTE_DORSO_CARD,
+    { title: 'Últimas DDJJ de IVA', sub: '(F. 2051)', img: '/ingresos-exterior.svg' },
+  ],
+};
+
+const DEFAULT_DOC_CARDS: DocCard[] = [
+  DNI_CARD,
+  { title: 'Comprobantes de ingresos', sub: '(Comprobantes o contratos de trabajo)', img: '/comprobante-ingresos.svg' },
+  { title: 'Ingresos del exterior', sub: '(En caso de no contar con ingresos en Argentina)', img: '/ingresos-exterior.svg' },
+];
+
+const PASSPORT_DOCUMENT_TYPE_ID = 2;
+const EMPLOYMENT_STUDENT_ID = 1;
+
+const PASSPORT_NON_STUDENT_CARDS: DocCard[] = [
+  PASSPORT_CARD,
+  { title: 'Comprobantes de ingresos', sub: '(Comprobantes o contratos de trabajo)', img: '/comprobante-ingresos.svg' },
+  { title: 'Ingresos del exterior', sub: '(En caso de no contar con ingresos en Argentina)', img: '/ingresos-exterior.svg' },
+];
+
+function getDocCards(employmentSituationId: number | null, documentTypeId: number | null): DocCard[] {
+  const isPassport = documentTypeId === PASSPORT_DOCUMENT_TYPE_ID;
+  const isStudent = employmentSituationId === EMPLOYMENT_STUDENT_ID;
+
+  if (isPassport && !isStudent) return PASSPORT_NON_STUDENT_CARDS;
+
+  if (employmentSituationId == null) return DEFAULT_DOC_CARDS;
+
+  const cards = DOC_CARDS_BY_SITUATION[employmentSituationId];
+  if (!cards) return DEFAULT_DOC_CARDS;
+
+  return cards.map((card) => (card === DNI_CARD || card === DNI_FRENTE_DORSO_CARD ? PASSPORT_CARD : card));
+}
 
 type PartnersQualificationDocumentationPendingProps = {
   qualification: Qualification;
@@ -15,7 +88,15 @@ export function PartnersQualificationDocumentationPending({
     qualification?.api_res_data?.front?.agente?.email?.trim() ?? '';
 
   const dispatch = useAppDispatch();
+  const state = useAppState();
+  const draft = selectQuotationDraft(state);
+  const employmentSituationId =
+    draft?.qualificationRequest?.user_personal_data?.employment_situation_id ?? null;
+  const documentTypeId =
+    draft?.qualificationRequest?.user_personal_data?.document_type_id ?? null;
   const tenantName = qualification?.api_res_data?.front?.nombre?.trim() ?? '';
+
+  const docCards = getDocCards(employmentSituationId, documentTypeId);
 
   function handleSendToAdvisor() {
     if (!agentEmail) {
@@ -58,30 +139,16 @@ export function PartnersQualificationDocumentationPending({
             </p>
           </div>
 
-          <ul className="partners-doc-pending-cards mt-10 grid list-none gap-4 p-0 sm:mt-12 md:grid-cols-3 md:gap-5">
-            <li className="partners-doc-pending-card">
-              <p className="partners-doc-pending-card-title">Documento de identidad vigente</p>
-              <p className="partners-doc-pending-card-sub">(Pasaporte o documento extranjero)</p>
-              <div className="partners-doc-pending-card-icon">
-                <img src="/documento.svg" alt="" />
-              </div>
-            </li>
-            <li className="partners-doc-pending-card">
-              <p className="partners-doc-pending-card-title">Comprobantes de ingresos</p>
-              <p className="partners-doc-pending-card-sub">(Comprobantes o contratos de trabajo)</p>
-              <div className="partners-doc-pending-card-icon">
-                <img src="/comprobante-ingresos.svg" alt="" />
-              </div>
-            </li>
-            <li className="partners-doc-pending-card">
-              <p className="partners-doc-pending-card-title">Ingresos del exterior</p>
-              <p className="partners-doc-pending-card-sub">
-                (En caso de no contar con ingresos en Argentina)
-              </p>
-              <div className="partners-doc-pending-card-icon">
-                <img src="/ingresos-exterior.svg" alt="" />
-              </div>
-            </li>
+          <ul className={`partners-doc-pending-cards mt-10 grid list-none gap-4 p-0 sm:mt-12 md:gap-5 ${docCards.length === 2 ? 'mx-auto max-w-2xl md:grid-cols-2' : 'md:grid-cols-3'}`}>
+            {docCards.map((card) => (
+              <li key={card.title} className="partners-doc-pending-card">
+                <p className="partners-doc-pending-card-title">{card.title}</p>
+                <p className="partners-doc-pending-card-sub">{card.sub}</p>
+                <div className="partners-doc-pending-card-icon">
+                  <img src={card.img} alt="" />
+                </div>
+              </li>
+            ))}
           </ul>
 
           <div className="partners-doc-pending-cta mx-auto mt-10 max-w-md text-center sm:mt-12">

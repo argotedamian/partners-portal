@@ -31,6 +31,9 @@ import {
 import { QualificationStatusId } from '@/mocks/qualification-status-id.enum';
 import { buildMockQualificationIntermediate } from '@/mocks/qualification-intermediate-states';
 import { buildMockQualificationRejected } from '@/mocks/qualification-rejected';
+import { getAutofillMock } from '@/mocks/form-autofill-mocks';
+
+const AUTOFILL_MOCK = getAutofillMock();
 import { useAppDispatch, useAppState } from '@/state/AppStateContext';
 import { selectAdvisorEmail } from '@/state/appState.selectors';
 
@@ -217,7 +220,9 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
   const dispatch = useAppDispatch();
   const advisorEmailFromStore = selectAdvisorEmail(useAppState());
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedDocType, setSelectedDocType] = useState(1);
+  const [selectedDocType, setSelectedDocType] = useState(
+    AUTOFILL_MOCK?.user_personal_data.document_type_id ?? 1,
+  );
   const [discountValidation, setDiscountValidation] = useState<Awaited<ReturnType<typeof validateDiscountCode>>>({
     status: 'idle',
   });
@@ -226,7 +231,7 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
   const form = useForm<FormValues>({
     mode: 'onChange',
     shouldUnregister: true,
-    defaultValues: {
+    defaultValues: AUTOFILL_MOCK ?? {
       user_personal_data: {
         document_type_id: 1,
         document_value: '',
@@ -388,7 +393,13 @@ export function useQuotationFlow({ onComplete }: UseQuotationFlowParams) {
         expenses: data.quotation.expenses,
       };
 
-      if (mockMode === null) {
+      if (AUTOFILL_MOCK !== null) {
+        qualification = buildMockQualificationIntermediate(QualificationStatusId.AlmostApproved, {
+          tenantEmail: data.user_personal_data.email,
+          agentEmail: partnerAgent.email,
+        });
+        toast.info(`Mock ${process.env.NEXT_PUBLIC_MOCK_INDEX}: documentación pendiente`);
+      } else if (mockMode === null) {
         qualification = await createQualification(qualificationRequest);
         qualification = alignQualificationStatusForPassport(qualification, passportAlignmentInput);
         toast.success('Calificación procesada');

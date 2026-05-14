@@ -287,6 +287,37 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
 
   // Co-solicitante (status_id: 9)
   if (statusId === 9) {
+    if (isPartners) {
+      return (
+        <>
+          <section className="py-8 sm:py-12">
+            <div className="max-w-6xl mx-auto px-4">
+              <div className="lg:w-1/2 lg:pr-12">
+                <h2 className="text-4xl sm:text-5xl font-bold text-[var(--app-green)] mb-4">
+                  {name ? `${name} necesita` : 'El inquilino necesita'} un co-solicitante.
+                </h2>
+                <p className="text-xl text-label">
+                  Para emitir la garantía, Hoggax{' '}
+                  <strong className="font-bold">
+                    necesita sumar a otra persona a la solicitud
+                  </strong>
+                  .
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="py-8 sm:py-10 bg-[var(--app-lilac)]">
+            <div className="max-w-6xl mx-auto px-4">
+              <p className="text-xl text-label">
+                Un asesor de Hoggax va a contactar al inquilino para continuar con el proceso.
+              </p>
+            </div>
+          </section>
+        </>
+      );
+    }
+
     return (
       <>
         {/* Sección superior — blanco */}
@@ -321,6 +352,45 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
 
   // Identidad (status_id: 11)
   if (statusId === 11) {
+    if (isPartners) {
+      return (
+        <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h2 className="text-2xl sm:text-3xl mb-4 text-label">
+                  No pudimos validar la identidad {name ? `de ${name}` : 'del inquilino'}.
+                </h2>
+                <p className="text-xl text-label">
+                  No es posible continuar con esta solicitud.
+                </p>
+              </div>
+              <div>
+                <p className="text-xl text-label">
+                  <strong className="font-bold">
+                    Los datos ingresados no permiten validar la identidad del inquilino.
+                  </strong>
+                </p>
+                <p className="text-lg text-label mt-2">
+                  Revisá la información ingresada y volvé a intentarlo, o contactá a Hoggax para más información.
+                </p>
+                <div className="mt-5">
+                  <a
+                    href="https://hoggax.com/contacto/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-5 py-3 border border-gray-500 rounded-lg"
+                  >
+                    Contactar a Hoggax
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
         <div className="max-w-6xl mx-auto px-4">
@@ -362,6 +432,46 @@ export function Result({ qualification: qualificationProp, isPartners = false }:
 
   // Error técnico (status_id: 13)
   if (statusId === 13) {
+    if (isPartners) {
+      return (
+        <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h2 className="text-2xl sm:text-3xl mb-4 text-label">
+                  Oops!
+                </h2>
+                <p className="text-xl text-label">
+                  Ocurrió un error al procesar la solicitud.
+                </p>
+              </div>
+              <div>
+                <p className="text-xl text-label">
+                  <strong className="font-bold">Tuvimos un desperfecto técnico.</strong>
+                </p>
+                <p className="text-lg text-label mt-2">
+                  La solicitud será procesada nuevamente en forma automática. Nos pondremos en contacto cuando esté resuelta.
+                </p>
+                <p className="text-lg text-label mt-2">
+                  Si el problema persiste, contactá a Hoggax para más información.
+                </p>
+                <div className="mt-5">
+                  <a
+                    href="https://hoggax.com/contacto/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-5 py-3 border border-gray-500 rounded-lg"
+                  >
+                    Contactar a Hoggax
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section className="py-8 sm:py-12 bg-[var(--app-lilac)]">
         <div className="max-w-6xl mx-auto px-4">
